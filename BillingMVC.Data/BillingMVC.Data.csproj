@@ -1,12 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Configurations\" />
-    <Folder Include="Repositories\" />
+    <ProjectReference Include="..\BillingMVC.Core\BillingMVC.Core.csproj" />
+    <ProjectReference Include="..\BillingMVC.Service\BillingMVC.Service.csproj" />
   </ItemGroup>
 
 </Project>

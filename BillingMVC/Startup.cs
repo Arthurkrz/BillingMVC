@@ -1,14 +1,14 @@
+using BillingMVC.Core.Contracts.Repositories;
+using BillingMVC.Core.Contracts.Services;
+using BillingMVC.Data.Repositories;
+using BillingMVC.IOC;
+using BillingMVC.Service;
+using BillingMVC.Web.Mapping;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using BillingMVC.IOC;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace BillingMVC.Web
 {
@@ -21,14 +21,16 @@ namespace BillingMVC.Web
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
             services.InjectServices();
+            services.InjectRepositories();
+            services.AddAutoMapper(typeof(MappingProfile));
+            services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped<IBillService, BillService>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -38,7 +40,6 @@ namespace BillingMVC.Web
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
             app.UseHttpsRedirection();

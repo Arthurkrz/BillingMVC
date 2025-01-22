@@ -1,0 +1,71 @@
+﻿@using BillingMVC.Web.Models.Enum
+@model BillViewModel
+
+<form method="post" asp-controller="Bill" asp-action="Create">
+    <div class="row mt-3">
+        <div class="col-6">
+            <label asp-for="Name" class="form-label"></label>
+            <textarea asp-for="Source"
+                      class="form-control mt-2"
+                      style="height: 50px; overflow-y: auto;"
+                      placeholder="Nome da despesa"></textarea>
+        </div>
+
+        <div class="col-6">
+            <label asp-for="ExpirationDate" 
+                   class="form-label">Vencimento</label>
+            <input asp-for="ExpirationDate" 
+                   class="form-control w-100 mt-2" 
+                   type="date" />
+        </div>
+
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <label asp-for="Type" class="form-label">Tipo</label>
+            <select asp-for="Type" 
+                    asp-items="@Html.GetEnumSelectList<BillTypeVM>()" 
+                    class="form-control w-100 mt-2" ></select>
+        </div>
+
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <label asp-for="Source" class="form-label"></label>
+            <textarea asp-for="Source"
+                      class="form-control mt-2"
+                      style="height: 50px; overflow-y: auto;"
+                      placeholder="Origem"></textarea>
+        </div>
+
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-6">
+            <label asp-for="Currency" class="form-label">Moeda</label>
+            <select asp-for="Currency"
+                    asp-items="@Html.GetEnumSelectList<CurrencyVM>()" 
+                    class="form-control w-100 mt-2"></select>
+        </div>
+
+        <div class="col-6">
+            <label asp-for="Value" class="form-label"></label>
+            <input asp-for="Value" class="form-control w-100 mt-2" 
+                   type="currency" />
+        </div>
+
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary me-2">Enviar</button>
+            <a type="button"
+               class="btn btn-danger"
+               asp-controller="bill"
+               asp-action="Index">Cancelar</a>
+        </div>
+    </div>
+
+</form>

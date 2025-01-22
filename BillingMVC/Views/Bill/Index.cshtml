@@ -1,0 +1,124 @@
+﻿@model IEnumerable<BillViewModel>
+@{
+    var model = Model.FirstOrDefault();
+    var successMessage = TempData["SuccessMessage"] as string;
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div id="successAlert" class="alert alert-success mx-auto" 
+         role="alert" 
+         style="position: relative; max-width: 500px;">
+        <div>@successMessage</div>
+    
+        <div class="progress mt-2" style="height: 6px;">
+            <div id="successProgressBar" 
+                 class="progress-bar progress-bar-striped progress-bar-animated" 
+                 role="progressbar" 
+                 style="width: 0%; transition: width 0.25s;">
+            </div>
+        </div>
+    </div>
+    <script>
+        const displayTime = 3000;
+        const progressBar = document.getElementById('successProgressBar');
+        const alertBox = document.getElementById('successAlert');
+        let startTime = null;
+
+        function animateProgress(timestamp) {
+            if (!startTime) startTime = timestamp;
+            let elapsed = timestamp = startTime;
+            let progress = Math.min(elapsed / displayTime, 1) * 100;
+            progressBar.style.width = progress + '%';
+
+            if (elapsed < displayTime) {
+                window.requestAnimationFrame(animateProgress);
+            } else {
+                alertBox.style.transition = 'opacity 0.5s';
+                alertBox.style.opacity = '0';
+                setTimeout(() => alertBox.style.display = 'none', 500);
+            }
+        }
+
+        window.requestAnimationFrame(animateProgress);
+    </script>
+}
+
+@*<div class="container">
+    <form method="post"
+</div>*@
+
+<div class="row">
+    <div class="col-12">
+        <table class="table table-striped table-hover text-center flex-column">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(x => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(x => model.Type)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(x => model.Currency)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(x => model.Value)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(x => model.Source)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(x => model.ExpirationDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(x => model.IsPaid)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bill in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(x => bill.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(x => bill.Type)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(x => bill.Currency)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(x => bill.Value)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(x => bill.Source)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(x => bill.ExpirationDate)
+                            @if (bill.IsPaid == false &&
+                              bill.ExpirationDate < DateTime.Now)
+                            {
+                                <i class="fa-solid fa-exclamation" style="color: #ffc800; margin-right: -8px;"></i>
+                            }
+                        </td>
+                        <td>
+                            @if (bill.IsPaid)
+                            {
+                                <i class="fa-solid fa-check" style="color: #00d192;"></i>
+                            }
+                            else
+                            {
+                                <i class="fa-solid fa-xmark" style="color: #ff0000;"></i>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <div class="row float-right" style="margin-right: 20px">
+            <a type="button" class="btn btn-primary" action="Create" asp-action="Create" asp-controller="Bill">Adicionar Conta</a>
+        </div>
+    </div>
+</div>
