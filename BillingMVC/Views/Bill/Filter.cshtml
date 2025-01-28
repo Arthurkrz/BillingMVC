@@ -1,0 +1,24 @@
+﻿@model BillFilterViewModel
+
+    <div class="container">
+        <form method="post" action="/Bill/Filter">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="NameContains">Nome</label>
+                    <input type="text" id="NameContains" name="NameContains" class="form-control" placeholder="Nome" value="@Model.NameContains" />
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="Type" class="form-label">Tipo</label>
+                    <select id="Type" name="Type" class="form-control" placeholder="Selecione">
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="ExpiredOnly">Expired only</label>
+                    @*<input type="checkbox" id="ExpiredOnly" name="ExpiredOnly" @(Model.ExpiredOnly ? "checked" : "") />*@
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary mt-4">Filter</button>
+                </div>
+            </div>
+        </form>
+    </div>

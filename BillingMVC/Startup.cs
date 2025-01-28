@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
 
 namespace BillingMVC.Web
 {
@@ -23,7 +24,10 @@ namespace BillingMVC.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<Context>(options => options.UseMySQL(
+                Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllersWithViews();
+            services.InjectValidator();
             services.InjectServices();
             services.InjectRepositories();
             services.AddAutoMapper(typeof(MappingProfile));

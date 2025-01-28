@@ -2,13 +2,15 @@
 @model BillViewModel
 
 <form method="post" asp-controller="Bill" asp-action="Create">
+    <div asp-validation-summary="All"></div>
     <div class="row mt-3">
         <div class="col-6">
             <label asp-for="Name" class="form-label"></label>
-            <textarea asp-for="Source"
+            <textarea asp-for="Name"
                       class="form-control mt-2"
                       style="height: 50px; overflow-y: auto;"
                       placeholder="Nome da despesa"></textarea>
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
         <div class="col-6">
@@ -38,6 +40,7 @@
                       class="form-control mt-2"
                       style="height: 50px; overflow-y: auto;"
                       placeholder="Origem"></textarea>
+            <span asp-validation-for="Source" class="text-danger"></span>
         </div>
 
     </div>
@@ -51,9 +54,10 @@
         </div>
 
         <div class="col-6">
-            <label asp-for="Value" class="form-label"></label>
+            <label asp-for="Value" class="form-label">Valor</label>
             <input asp-for="Value" class="form-control w-100 mt-2" 
-                   type="currency" />
+                   type="number" />
+            <span asp-validation-for="Value" class="text-danger"></span>
         </div>
 
     </div>
@@ -61,6 +65,7 @@
     <div class="row mt-3">
         <div class="col-12">
             <button type="submit" class="btn btn-primary me-2">Enviar</button>
+
             <a type="button"
                class="btn btn-danger"
                asp-controller="bill"

@@ -4,10 +4,10 @@ using System.Text;
 
 namespace BillingMVC.Core.Enum
 {
-    public enum Currency
+    public enum CustomBoolean
     {
         NA = 0,
-        Euro = 1,
-        Real = 2
+        Yes = 1,
+        No = 2
     }
 }

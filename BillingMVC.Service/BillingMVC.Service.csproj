@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BillingMVC.Core\BillingMVC.Core.csproj" />
-    <ProjectReference Include="..\BillingMVC.IOC\BillingMVC.IOC.csproj" />
   </ItemGroup>
 
 </Project>

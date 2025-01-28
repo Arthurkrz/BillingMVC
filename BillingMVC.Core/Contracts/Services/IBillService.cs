@@ -10,6 +10,7 @@ namespace BillingMVC.Core.Contracts.Services
         void CreateBill(Bill entity);
         IEnumerable<Bill> GetBillsWithFilter
             (Expression<Func<Bill, bool>> predicate);
+        IEnumerable<Bill> List();
         void UpdateBill(Bill bill);
         void DeleteBill(Bill bill);
     }

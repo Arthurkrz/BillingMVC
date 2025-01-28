@@ -1,4 +1,5 @@
-﻿using BillingMVC.Web.Models.Enum;
+﻿using BillingMVC.Core.Enum;
+using BillingMVC.Web.Models.Enum;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -21,7 +22,6 @@ namespace BillingMVC.Web.Models
         public CurrencyVM Currency { get; set; }
 
         [Required(ErrorMessage = "Informe o valor.")]
-        [Range(1, 1000000, ErrorMessage = "O valor deve ser entre 1 e 1 milhão.")]
         [DisplayName("Valor")]
         public double Value { get; set; }
 
@@ -36,9 +36,8 @@ namespace BillingMVC.Web.Models
         [DisplayName("Origem")]
         public string Source { get; set; }
 
-        [Required(ErrorMessage = "Informe se a conta foi paga ou não.")]
         [DisplayName("Pago")]
-        public bool IsPaid { get; set; }
+        public CustomBoolean IsPaid { get; set; }
 
         [Required(ErrorMessage = "Informe a data de vencimento da conta.")]
         [DisplayName("Vencimento")]
@@ -46,8 +45,7 @@ namespace BillingMVC.Web.Models
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime ExpirationDate { get; set; }
 
-        // padrão falso
         [DisplayName("Recorrente")]
-        public bool IsRecurring { get; set; }
+        public CustomBoolean IsRecurring { get; set; }
     }
 }

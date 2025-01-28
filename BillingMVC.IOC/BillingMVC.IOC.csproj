@@ -5,7 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BillingMVC.Core\BillingMVC.Core.csproj" />
+    <ProjectReference Include="..\BillingMVC.Service\BillingMVC.Service.csproj" />
   </ItemGroup>
 
 </Project>

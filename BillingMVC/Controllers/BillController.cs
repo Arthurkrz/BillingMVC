@@ -1,13 +1,10 @@
 ﻿using AutoMapper;
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Core.Entities;
-using BillingMVC.Core.Enum;
 using BillingMVC.Service.Filters;
 using BillingMVC.Service.PredicateBuilder;
-using BillingMVC.Web.Factories;
 using BillingMVC.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 
 namespace BillingMVC.Web.Controllers
@@ -24,32 +21,10 @@ namespace BillingMVC.Web.Controllers
 
         public IActionResult Index()
         {
-            List<Bill> bills = new List<Bill>()
-            {
-                new Bill()
-                {
-                    Name = "Luz",
-                    Type = BillType.Services,
-                    Currency = Currency.Euro,
-                    Value = 36,
-                    Source = "Copel",
-                    ExpirationDate = new DateTime(2025, 02, 10),
-                    IsPaid = true
-                },
-                new Bill()
-                {
-                    Name = "Agua",
-                    Type = BillType.Services,
-                    Currency = Currency.Euro,
-                    Value = 6.7,
-                    Source = "Sanepar",
-                    ExpirationDate = new DateTime(2025, 01, 10),
-                    IsPaid = false
-                }
-            };
+            IEnumerable<Bill> bills = _billService.List();
 
-            var billsVM = _mapper.Map<List<BillViewModel>>(bills);
             //bills = _billService.GetAllFromCurrentMonth();
+            var billsVM = _mapper.Map<List<BillViewModel>>(bills);
 
             return View(billsVM);
         }
@@ -64,15 +39,19 @@ namespace BillingMVC.Web.Controllers
         public IActionResult Create(BillViewModel model)
         {
             if (!ModelState.IsValid)
-                return View(model);
+                return BadRequest("Conta não cadastrada.");
 
-            var factory = new BillEntityFactory();
-            var entity = factory.CreateBillEntityFactory(model);
-            entity = _mapper.Map<Bill>(model);
+            var entity = _mapper.Map<Bill>(model);
             _billService.CreateBill(entity);
 
             TempData["SuccessMessage"] = "Conta cadastrada com sucesso!";
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult Filter()
+        {
+            return View();
         }
 
         [HttpPost]
@@ -84,7 +63,7 @@ namespace BillingMVC.Web.Controllers
             var billsViewModel = _mapper.Map<List<BillViewModel>>(filteredBills);
             filterViewModel.Bills = billsViewModel;
 
-            return View("Index", filterViewModel);
+            return View(filterViewModel);
         }
     }
 }

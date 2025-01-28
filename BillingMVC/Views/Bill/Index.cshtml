@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<BillViewModel>
+
 @{
     var model = Model.FirstOrDefault();
     var successMessage = TempData["SuccessMessage"] as string;
@@ -6,21 +7,21 @@
 
 @if (!string.IsNullOrEmpty(successMessage))
 {
-    <div id="successAlert" class="alert alert-success mx-auto" 
-         role="alert" 
+    <div id="successAlert" class="alert alert-success mx-auto"
+         role="alert"
          style="position: relative; max-width: 500px;">
-        <div>@successMessage</div>
-    
+        <div style="position: center">@successMessage</div>
+
         <div class="progress mt-2" style="height: 6px;">
-            <div id="successProgressBar" 
-                 class="progress-bar progress-bar-striped progress-bar-animated" 
-                 role="progressbar" 
+            <div id="successProgressBar"
+                 class="progress-bar progress-bar-striped progress-bar-animated"
+                 role="progressbar"
                  style="width: 0%; transition: width 0.25s;">
             </div>
         </div>
     </div>
     <script>
-        const displayTime = 3000;
+        const displayTime = 1000;
         const progressBar = document.getElementById('successProgressBar');
         const alertBox = document.getElementById('successAlert');
         let startTime = null;
@@ -44,9 +45,16 @@
     </script>
 }
 
-@*<div class="container">
-    <form method="post"
-</div>*@
+<div class="container">
+    <div class="d-flex justify-content-end mb-3">
+        <div>
+            <a type="button" class="btn btn-primary" style="margin-right: 10px" asp-action="Filter" asp-controller="Bill">Busca</a>
+        </div>
+        <div>
+            <a type="button" class="btn btn-primary" asp-action="Create" asp-controller="Bill">Adicionar Conta</a>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-12">
@@ -98,7 +106,7 @@
                         <td>
                             @Html.DisplayFor(x => bill.ExpirationDate)
                             @if (bill.IsPaid == false &&
-                              bill.ExpirationDate < DateTime.Now)
+                            bill.ExpirationDate < DateTime.Now)
                             {
                                 <i class="fa-solid fa-exclamation" style="color: #ffc800; margin-right: -8px;"></i>
                             }
@@ -117,8 +125,5 @@
                 }
             </tbody>
         </table>
-        <div class="row float-right" style="margin-right: 20px">
-            <a type="button" class="btn btn-primary" action="Create" asp-action="Create" asp-controller="Bill">Adicionar Conta</a>
-        </div>
     </div>
 </div>

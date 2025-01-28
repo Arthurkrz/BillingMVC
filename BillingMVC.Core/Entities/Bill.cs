@@ -11,7 +11,7 @@ namespace BillingMVC.Core.Entities
         public BillType Type { get; set; }
         public DateTime ExpirationDate { get; set; }
         public string Source { get; set; }
-        public bool IsPaid { get; set; }
-        public bool IsRecurring { get; set; }
+        public CustomBoolean IsPaid { get; set; }
+        public CustomBoolean IsRecurring { get; set; }
     }
 }

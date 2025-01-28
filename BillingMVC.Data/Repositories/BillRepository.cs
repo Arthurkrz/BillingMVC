@@ -10,16 +10,36 @@ namespace BillingMVC.Data.Repositories
 {
     public class BillRepository : IBillRepository
     {
-        //private readonly AppDbContext _context;
-        //public BillRepository(AppDbContext context)
-        //{
-        //    _context = context;
-        //}
+        public static List<Bill> _bills = new List<Bill>()
+        {
+            new Bill
+            {
+                 Name = "Luz",
+                 Type = BillType.Services,
+                 Currency = Currency.Euro,
+                 Value = 36,
+                 Source = "Copel",
+                 ExpirationDate = new DateTime(2025, 02, 10),
+                 IsPaid = true,
+                 IsRecurring = true
+            },
 
-        private readonly List<Bill> _bills = new List<Bill>();
+            new Bill
+            {
+                Name = "Água",
+                Type = BillType.Services,
+                Currency = Currency.Euro,
+                Value = 6.7,
+                Source = "Sanepar",
+                ExpirationDate = new DateTime(2025, 01, 10),
+                IsPaid = false,
+                IsRecurring = true
+            }
+        };
+
         public void Add(Bill bill)
         {
-            
+            _bills.Add(bill);
         }
 
         public void Update(Bill bill)
@@ -47,6 +67,11 @@ namespace BillingMVC.Data.Repositories
         public void Delete(Bill bill)
         {
             
+        }
+
+        public IEnumerable<Bill> GetAll()
+        {
+            return _bills;
         }
 
         public IEnumerable<Bill> GetBillsWithFilter
