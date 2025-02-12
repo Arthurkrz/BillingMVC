@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BillingMVC.Data", "..\Billi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BillingMVC.IOC", "..\BillingMVC.IOC\BillingMVC.IOC.csproj", "{9E04B153-AB33-471F-8F4D-BCEFA7228AF7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BillingMVC.Tests", "..\BillingMVC.Tests\BillingMVC.Tests.csproj", "{F0E1C28C-392D-4BEE-8FD7-B22817E4F0E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BillingMVC.Tests", "..\BillingMVC.Tests\BillingMVC.Tests.csproj", "{F0E1C28C-392D-4BEE-8FD7-B22817E4F0E6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -90,15 +90,15 @@ namespace BillingMVC.Web.Controllers
 
         public IActionResult Delete(Guid id)
         {
-           var result = _billService.DeleteBill(id);
+           var bill = _billService.DeleteBill(id);
 
-            if (!result.Success)
+            if (bill == null)
             {
-                return Json(new { success = false, errors = result.Errors });
+                return RedirectToAction("Index");
             }
 
             TempData["SuccessMessage"] = "Despesa deletada com sucesso!";
-            return Json(new { success = true });
+            return RedirectToAction("Index");
         }
 
         [HttpPost]

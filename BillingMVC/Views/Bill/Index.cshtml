@@ -3,6 +3,7 @@
 @{
     var model = Model.FirstOrDefault();
     var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
 }
 
 @if (!string.IsNullOrEmpty(successMessage))
@@ -169,7 +170,7 @@
         let billId = buttonId.replace("saveEditButton-", "");
 
         let form = $("#editBillForm-" + billId);
-        
+
         form.validate();
 
         if (!form.valid()) {
