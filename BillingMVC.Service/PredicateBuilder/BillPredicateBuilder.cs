@@ -28,17 +28,11 @@ namespace BillingMVC.Service.PredicateBuilder
 
             if (filter.DateRangeStart.HasValue)
             {
-                predicate = predicate.And(b => b.ExpirationDate >= filter.DateRangeStart.Value);
+                predicate = predicate.And(b => b.PurchaseDate >= filter.DateRangeStart.Value);
             }
             if (filter.DateRangeEnd.HasValue)
             {
-                predicate = predicate.And(b => b.ExpirationDate <= filter.DateRangeEnd.Value);
-            }
-
-            if (filter.IsPaid.HasValue)
-            {
-                bool paid = filter.IsPaid.Value;
-                predicate = predicate.And(b => b.IsPaid == paid);
+                predicate = predicate.And(b => b.PurchaseDate <= filter.DateRangeEnd.Value);
             }
 
             if (filter.Currency.HasValue)
@@ -51,12 +45,6 @@ namespace BillingMVC.Service.PredicateBuilder
             {
                 var chosenType = filter.Type.Value;
                 predicate = predicate.And(b => b.Type == chosenType);
-            }
-            
-            if (filter.IsRecurring.HasValue)
-            {
-                var chosenType = filter.IsRecurring.Value;
-                predicate = predicate.And(b => b.IsRecurring == chosenType);
             }
 
             return predicate;

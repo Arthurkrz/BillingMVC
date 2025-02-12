@@ -1,51 +1,47 @@
 ﻿using BillingMVC.Core.Contracts.Repositories;
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Core.Entities;
-using BillingMVC.Core.Validators;
+using FluentValidation;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace BillingMVC.Service
 {
     public class BillService : IBillService
     {
-        private readonly BillValidator _validator;
-        private readonly IBillRepository _billRepository;
+        private readonly IValidator<Bill> _validator;
+        private readonly IBillRepository _billRepository;   
+
         public BillService
                (IBillRepository billRepository, 
-                BillValidator validator)
+                IValidator<Bill> validator)
         {
             _validator = validator;
             _billRepository = billRepository;
         }
 
-        public void CreateBill(Bill bill)
+        public ServiceResponse CreateBill(Bill bill)
         {
+            if (bill == null)
+            {
+                return new ServiceResponse { Success = false, Errors = new List<string> { "A despesa não pode ser nula." } };
+            }
+
             var result = _validator.Validate(bill);
+
             if (!result.IsValid)
             {
-                var errors = new StringBuilder();
-                result.Errors.ForEach(error => errors.AppendLine(error.ErrorMessage));
-                throw new InvalidOperationException(errors.ToString());
-            }
-            else
-            {
-                if (!_billRepository.FindIdentical(bill.Name, bill.Currency,
-                                   bill.Value, bill.Type,
-                                   bill.ExpirationDate,
-                                   bill.Source, bill.IsPaid,
-                                   bill.IsRecurring))
+                return new ServiceResponse
                 {
-                    _billRepository.Add(bill);
-                }
-                else
-                {
-                    throw new ArgumentException
-                        ("Uma conta idêntica já foi adicionada.");
-                }
+                    Success = false,
+                    Errors = result.Errors.Select(e => e.ErrorMessage).ToList()
+                };
             }
+
+            _billRepository.Add(bill);
+            return new ServiceResponse { Success = true };
         }
 
         public IEnumerable<Bill> List()
@@ -54,19 +50,10 @@ namespace BillingMVC.Service
         }
 
         public IEnumerable<Bill> GetBillsWithFilter
-                                 (Expression<Func<Bill, bool>> filter)
+                                 (Expression<Func<Bill, bool>> 
+                                  filter)
         {
             return _billRepository.GetBillsWithFilter(filter);
-        }
-
-        public void PayBill()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Bill GetSelectedBill(Bill bill)
-        {
-            throw new NotImplementedException();
         }
 
         public List<Bill> GetAllFromCurrentMonth()
@@ -74,16 +61,47 @@ namespace BillingMVC.Service
             throw new NotImplementedException();
         }
 
-        public void UpdateBill(Bill bill)
+        public ServiceResponse UpdateBill(Bill bill)
         {
-            throw new NotImplementedException();
+            var existingBill = _billRepository.GetById(bill.Id);
+            if (existingBill == null)
+            {
+                return new ServiceResponse
+                {
+                    Success = false,
+                    Errors = new List<string> { "A despesa não foi encontrada." }
+                };
+            }
+
+            var result = _validator.Validate(bill);
+            if (!result.IsValid)
+            {
+                return new ServiceResponse
+                {
+                    Success = false,
+                    Errors = result.Errors.Select(e => e.ErrorMessage).ToList()
+                };
+            }
+
+            _billRepository.Update(bill);
+            return new ServiceResponse { Success = true };
         }
 
-        public void DeleteBill(Bill bill)
+        public ServiceResponse DeleteBill(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = _billRepository.GetById(id);
+
+            if (entity == null)
+            {
+                return new ServiceResponse
+                {
+                    Success = false,
+                    Errors = new List<string>() { "ID não corresponde a nenhuma despesa." }
+                };
+            }
+
+            _billRepository.Delete(entity);
+            return new ServiceResponse { Success = true };
         }
     }
 }
-// notificacoes
-// contas recorrentes

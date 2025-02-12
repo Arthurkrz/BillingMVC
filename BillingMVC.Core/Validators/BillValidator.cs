@@ -1,5 +1,4 @@
 ﻿using BillingMVC.Core.Entities;
-using BillingMVC.Core.Enum;
 using FluentValidation;
 using System;
 
@@ -9,46 +8,30 @@ namespace BillingMVC.Core.Validators
     {
         public BillValidator()
         {
-            this.RuleFor(b => b.Name)
-                .NotEmpty()
-                .NotNull()
-                .WithMessage("Insira um nome.");
+            this.RuleFor(b => b.Name).Must(n => 
+                       !string.IsNullOrEmpty(n))
+               .WithMessage("Insira um nome.");
 
-            this.RuleFor(b => b.ExpirationDate)
-                .Must(b => b != default)
-                .WithMessage("Insira uma data de " +
-                             "vencimento da conta.");
+            this.RuleFor(b => b.PurchaseDate)
+                .NotNull().NotEqual(default(DateTime))
+                .WithMessage("Insira a data da " +
+                             "despesa.");
 
-            this.RuleFor(b => b.ExpirationDate)
+            this.RuleFor(b => b.PurchaseDate)
                 .GreaterThan(DateTime.Now.AddYears(-1))
-                .WithMessage("Contas vencidas a mais " +
-                             "de 1 ano não podem " +
-                             "ser adicionadas.");
+                .WithMessage("Despesas de mais de 1 ano atrás não podem ser adicionadas.");
 
-            this.RuleFor(b => b.ExpirationDate)
-                .Must((request, date) => request.IsPaid != 
-                CustomBoolean.No && date < DateTime.Now.AddMonths(-6))
-                .WithMessage("Contas não pagas vencidas a " +
-                             "mais de 6 meses não podem " +
-                             "ser adicionadas.");
-
-            this.RuleFor(b => b.Source)
-                .NotEmpty()
-                .NotNull()
-                .WithMessage("Insira a origem da conta.");
-
-            this.RuleFor(b => b.IsPaid)
-                .NotEqual(CustomBoolean.NA)
-                .WithMessage("Especifique se a conta " +
-                             "foi paga ou não.");
+            this.RuleFor(b => b.Source).Must(n => 
+                          !string.IsNullOrEmpty(n))
+                .WithMessage("Insira a origem da despesa.");
 
             this.RuleFor(b => b.Value)
                 .NotEqual(0)
-                .WithMessage("Especifique o valor da conta.");
+                .WithMessage("Especifique o valor da despesa.");
 
             this.RuleFor(b => b.Value)
                 .LessThan(1000000)
-                .WithMessage("O valor da conta não pode " +
+                .WithMessage("O valor da despesa não pode " +
                              "ser maior que R$ 1 milhão.");
 
             this.RuleFor(b => b.Currency)
@@ -57,7 +40,7 @@ namespace BillingMVC.Core.Validators
 
             this.RuleFor(b => b.Type)
                 .NotNull()
-                .WithMessage("Especifique a categoria da conta.");
+                .WithMessage("Especifique a categoria da despesa.");
         }
     }
 }

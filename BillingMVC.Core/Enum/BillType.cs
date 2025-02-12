@@ -4,9 +4,6 @@ namespace BillingMVC.Core.Enum
 {
     public enum BillType
     {
-        [Display(Name = "Selecione")]
-        Select,
-
         [Display(Name = "Alimentação")]
         Food,
 

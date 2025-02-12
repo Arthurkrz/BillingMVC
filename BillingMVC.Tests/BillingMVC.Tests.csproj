@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Bogus" Version="35.6.1" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit" Version="2.4.0" />
@@ -17,6 +18,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BillingMVC.Core\BillingMVC.Core.csproj" />
+    <ProjectReference Include="..\BillingMVC.Data\BillingMVC.Data.csproj" />
+    <ProjectReference Include="..\BillingMVC.Service\BillingMVC.Service.csproj" />
   </ItemGroup>
 
 </Project>

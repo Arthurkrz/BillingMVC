@@ -7,11 +7,11 @@ namespace BillingMVC.Core.Contracts.Services
 {
     public interface IBillService
     {
-        void CreateBill(Bill entity);
+        ServiceResponse CreateBill(Bill entity);
         IEnumerable<Bill> GetBillsWithFilter
             (Expression<Func<Bill, bool>> predicate);
         IEnumerable<Bill> List();
-        void UpdateBill(Bill bill);
-        void DeleteBill(Bill bill);
+        ServiceResponse UpdateBill(Bill bill);
+        ServiceResponse DeleteBill(Guid id);
     }
 }

@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace BillingMVC.Core.Enum
 {
     public enum Currency
     {
-        NA = 0,
-        Euro = 1,
-        Real = 2
+        [Display(Name = "Euro")]
+        Euro,
+
+        [Display(Name = "Real")]
+        Real
     }
 }

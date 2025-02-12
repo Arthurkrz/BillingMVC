@@ -75,14 +75,96 @@
         }
       }
     },
-    "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Tests\\BillingMVC.Tests.csproj": {
+    "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Data\\BillingMVC.Data.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Tests\\BillingMVC.Tests.csproj",
-        "projectName": "BillingMVC.Tests",
-        "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Tests\\BillingMVC.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Data\\BillingMVC.Data.csproj",
+        "projectName": "BillingMVC.Data",
+        "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Data\\BillingMVC.Data.csproj",
         "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Tests\\obj\\",
+        "outputPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Data\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Core\\BillingMVC.Core.csproj": {
+                "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Core\\BillingMVC.Core.csproj"
+              },
+              "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Service\\BillingMVC.Service.csproj": {
+                "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Service\\BillingMVC.Service.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.1.32, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[3.1.32, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.1.32, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.426\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Service\\BillingMVC.Service.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Service\\BillingMVC.Service.csproj",
+        "projectName": "BillingMVC.Service",
+        "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Service\\BillingMVC.Service.csproj",
+        "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Service\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -114,10 +196,81 @@
       "frameworks": {
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.426\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Tests\\BillingMVC.Tests.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Tests\\BillingMVC.Tests.csproj",
+        "projectName": "BillingMVC.Tests",
+        "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Tests\\BillingMVC.Tests.csproj",
+        "packagesPath": "C:\\Users\\PC\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Tests\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Core\\BillingMVC.Core.csproj": {
+                "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Core\\BillingMVC.Core.csproj"
+              },
+              "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Data\\BillingMVC.Data.csproj": {
+                "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Data\\BillingMVC.Data.csproj"
+              },
+              "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Service\\BillingMVC.Service.csproj": {
+                "projectPath": "C:\\Users\\PC\\Documents\\TechClass\\MVC\\BillingMVC.Service\\BillingMVC.Service.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
           "dependencies": {
             "Bogus": {
               "target": "Package",
               "version": "[35.6.1, )"
+            },
+            "FluentValidation.AspNetCore": {
+              "target": "Package",
+              "version": "[11.3.0, )"
             },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",

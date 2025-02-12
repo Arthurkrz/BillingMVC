@@ -6,10 +6,10 @@ using BillingMVC.Service;
 using BillingMVC.Web.Mapping;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
 
 namespace BillingMVC.Web
 {
@@ -24,8 +24,9 @@ namespace BillingMVC.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<Context>(options => options.UseMySQL(
-                Configuration.GetConnectionString("DefaultConnection")));
+            string test = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
+            var stringDb = Configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<Context>(options => options.UseSqlServer(stringDb));
             services.AddControllersWithViews();
             services.InjectValidator();
             services.InjectServices();
