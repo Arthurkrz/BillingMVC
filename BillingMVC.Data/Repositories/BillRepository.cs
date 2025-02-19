@@ -1,10 +1,11 @@
 ﻿using BillingMVC.Core.Contracts.Repositories;
 using BillingMVC.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace BillingMVC.Data.Repositories
 {
@@ -16,15 +17,15 @@ namespace BillingMVC.Data.Repositories
             _context = context;
         }
 
-        public IEnumerable<Bill> GetBillsWithFilter(Expression<Func<Bill, bool>> predicate)
+        public async Task<IEnumerable<Bill>> GetBillsWithFilter(Expression<Func<Bill, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return await _context.Set<Bill>().Where(predicate).ToListAsync();
         }
 
-        public Bill GetById(Guid id)
+        public async Task<Bill> GetById(Guid id)
         {
-            var bill = this.GetAll().FirstOrDefault(b => b.Id == id);
-            return bill;
+            var queryableBills = await this.GetAll();
+            return await queryableBills.FirstOrDefaultAsync(b => b.Id == id);
         }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using BillingMVC.Core.Contracts.Repositories;
 using BillingMVC.Core.Entities;
-using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace BillingMVC.Data.Repositories
 {
@@ -17,7 +15,7 @@ namespace BillingMVC.Data.Repositories
             _context = context;
         }
 
-        public void Add(T entity)
+        public async Task Add(T entity)
         {
             if (entity is null)
             {
@@ -25,21 +23,21 @@ namespace BillingMVC.Data.Repositories
             }
 
             _context.Set<T>().Add(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(T entity)
+        public async Task Delete(T entity)
         {
             _context.Set<T>().Remove(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public IQueryable<T> GetAll()
+        public Task<IQueryable<T>> GetAll()
         {
-            return _context.Set<T>();
+            return Task.FromResult(_context.Set<T>().AsQueryable());
         }
 
-        public void Update(T entity)
+        public async Task Update(T entity)
         {
             var existingEntity = _context.Set<T>().Find(entity.Id);
             if (existingEntity == null)
@@ -48,7 +46,7 @@ namespace BillingMVC.Data.Repositories
             }
 
             _context.Entry(existingEntity).CurrentValues.SetValues(entity);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }

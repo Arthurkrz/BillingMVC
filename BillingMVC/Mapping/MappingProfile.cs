@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BillingMVC.Core.Entities;
 using BillingMVC.Core.Enum;
-using BillingMVC.Service.Filters;
 using BillingMVC.Web.Models;
 using BillingMVC.Web.Models.Enum;
 using System;

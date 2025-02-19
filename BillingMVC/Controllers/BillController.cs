@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Core.Entities;
-using BillingMVC.Service.Filters;
-using BillingMVC.Service.PredicateBuilder;
 using BillingMVC.Web.Models;
 using BillingMVC.Web.Models.Enum;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BillingMVC.Web.Controllers
 {
@@ -22,16 +21,18 @@ namespace BillingMVC.Web.Controllers
             _mapper = mapper;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var bills = _billService.List();
+            var bills = await _billService.List();
             var billsVM = _mapper.Map<List<BillViewModel>>(bills);
 
             double euroToRealRate = 5.50;
             double realToEuroRate = 1 / euroToRealRate;
 
-            double totalInReais = billsVM.Sum(bill => bill.Currency == CurrencyVM.Euro ? bill.Value * euroToRealRate : bill.Value);
-            double totalInEuros = billsVM.Sum(bill => bill.Currency == CurrencyVM.Real ? bill.Value * realToEuroRate : bill.Value);
+            double totalInReais = billsVM.Sum(bill => bill.Currency == 
+            CurrencyVM.Euro ? bill.Value * euroToRealRate : bill.Value);
+            double totalInEuros = billsVM.Sum(bill => bill.Currency == 
+            CurrencyVM.Real ? bill.Value * realToEuroRate : bill.Value);
 
             ViewBag.TotalInReais = totalInReais;
             ViewBag.TotalInEuros = totalInEuros;
@@ -46,7 +47,7 @@ namespace BillingMVC.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(BillViewModel model)
+        public async Task<IActionResult> Create(BillViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -59,7 +60,7 @@ namespace BillingMVC.Web.Controllers
             }
 
             var entity = _mapper.Map<Bill>(model);
-            var result = _billService.CreateBill(entity);
+            var result = await _billService.CreateBill(entity);
 
             if (!result.Success)
             {
@@ -73,24 +74,50 @@ namespace BillingMVC.Web.Controllers
         [HttpGet]
         public IActionResult Filter()
         {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Filter(BillFilterViewModel filterViewModel)
-        {
-            var filterModel = _mapper.Map<BillFilter>(filterViewModel);
-            var filterExpression = BillPredicateBuilder.Build(filterModel);
-            var filteredBills = _billService.GetBillsWithFilter(filterExpression);
-            var billsViewModel = _mapper.Map<List<BillViewModel>>(filteredBills);
-            filterViewModel.Bills = billsViewModel;
+            var filterViewModel = new BillFilterViewModel
+            {
+                ValueStringRangeStart = string.Empty,
+                ValueStringRangeEnd = string.Empty,
+                Bills = new List<BillViewModel>()
+            };
 
             return View(filterViewModel);
         }
 
-        public IActionResult Delete(Guid id)
+        [HttpPost]
+        public async Task<IActionResult> Filter(BillFilterViewModel filterViewModel)
         {
-           var bill = _billService.DeleteBill(id);
+            if (filterViewModel == null || !filterViewModel.Bills.Any()
+                && string.IsNullOrWhiteSpace(filterViewModel.NameContains)
+                && string.IsNullOrWhiteSpace(filterViewModel.SourceContains)
+                && filterViewModel.DateRangeStart == null
+                && filterViewModel.DateRangeEnd == null
+                && filterViewModel.ValueRangeStart == null
+                && filterViewModel.ValueRangeEnd == null
+                && filterViewModel.Month == null
+                && filterViewModel.Currency == null
+                && filterViewModel.Type == null)
+            {
+                return Json(new { success = false, errors = new List<string> 
+                { "Adicione pelo menos 1 parâmetro de busca." } });
+            }
+
+            var filterModel = _mapper.Map<BillFilter>(filterViewModel);
+            var response = await _billService.GetBillsWithFilter(filterModel);
+
+            if (!response.Success)
+            {
+                return Json(new { success = false, errors = response.Errors });
+            }
+
+            var billsViewModel = _mapper.Map<List<BillViewModel>>(response.Data);
+
+            return PartialView("_BillTable", billsViewModel);
+        }
+
+        public async Task<IActionResult> Delete(Guid id)
+        {
+           var bill = await _billService.DeleteBill(id);
 
             if (bill == null)
             {
@@ -102,11 +129,12 @@ namespace BillingMVC.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update(BillViewModel billVM)
+        public async Task<IActionResult> Update(BillViewModel billVM)
         {
             if (billVM.Id == Guid.Empty)
             {
-                return Json(new { success = false, errors = new List<string> { "ID da despesa inválido." } });
+                return Json(new { success = false, errors = new List<string> 
+                { "ID da despesa inválido." } });
             }
 
             if (!ModelState.IsValid)
@@ -120,7 +148,7 @@ namespace BillingMVC.Web.Controllers
             }
 
             var entity = _mapper.Map<Bill>(billVM);
-            var result = _billService.UpdateBill(entity);
+            var result = await _billService.UpdateBill(entity);
 
             if (!result.Success)
             {

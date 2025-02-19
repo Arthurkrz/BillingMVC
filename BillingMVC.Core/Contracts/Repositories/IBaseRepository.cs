@@ -1,16 +1,14 @@
 ﻿using BillingMVC.Core.Entities;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace BillingMVC.Core.Contracts.Repositories
 {
     public interface IBaseRepository<T> where T : Entity
     {
-        IQueryable<T> GetAll();
-        void Add(T entity);
-        void Delete(T entity);
-        void Update(T entity);
+        Task<IQueryable<T>> GetAll();
+        Task Add(T entity);
+        Task Delete(T entity);
+        Task Update(T entity);
     }
 }

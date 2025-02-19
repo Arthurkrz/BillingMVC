@@ -1,5 +1,4 @@
 ﻿using BillingMVC.Core.Entities;
-using BillingMVC.Service.Filters;
 using LinqKit;
 using System;
 using System.Linq.Expressions;
@@ -14,37 +13,62 @@ namespace BillingMVC.Service.PredicateBuilder
 
             if (!string.IsNullOrEmpty(filter.NameContains))
             {
-                predicate = predicate.And(b => b.Name.Contains(filter.NameContains));
+                string filterName = filter.NameContains.Trim().ToLower();
+                predicate = predicate.And(b => b.Name.ToLower()
+                                     .Contains(filterName));
+            }
+
+            if (!string.IsNullOrEmpty(filter.SourceContains))
+            {
+                string filterSource = filter.SourceContains.Trim().ToLower();
+                predicate = predicate.And(b => b.Source.ToLower()
+                                     .Contains(filterSource));
             }
 
             if (filter.ValueRangeStart.HasValue)
             {
-                predicate = predicate.And(b => b.Value >= filter.ValueRangeStart.Value);
+                predicate = predicate.And(b => b.Value >= 
+                                      filter.ValueRangeStart.Value);
             }
             if (filter.ValueRangeEnd.HasValue)
             {
-                predicate = predicate.And(b => b.Value <= filter.ValueRangeEnd.Value);
+                predicate = predicate.And(b => b.Value <= 
+                                      filter.ValueRangeEnd.Value);
             }
 
             if (filter.DateRangeStart.HasValue)
             {
-                predicate = predicate.And(b => b.PurchaseDate >= filter.DateRangeStart.Value);
+                predicate = predicate.And(b => b.PurchaseDate >= 
+                                      filter.DateRangeStart.Value);
             }
             if (filter.DateRangeEnd.HasValue)
             {
-                predicate = predicate.And(b => b.PurchaseDate <= filter.DateRangeEnd.Value);
+                predicate = predicate.And(b => b.PurchaseDate <= 
+                                      filter.DateRangeEnd.Value);
             }
 
             if (filter.Currency.HasValue)
             {
-                var chosenType = filter.Currency.Value;
-                predicate = predicate.And(b => b.Currency == chosenType);
+                var chosenCurrency = filter.Currency.Value;
+                predicate = predicate.And(b => b.Currency == 
+                                             chosenCurrency);
             }
 
             if (filter.Type.HasValue)
             {
                 var chosenType = filter.Type.Value;
                 predicate = predicate.And(b => b.Type == chosenType);
+            }
+
+            if (filter.Month.HasValue)
+            {
+                DateTime filterDateStart = new DateTime(DateTime.Now.Year, 
+                                                (int)filter.Month.Value, 1);
+                DateTime filterDateEnd = filterDateStart.AddMonths(1)
+                                                        .AddDays(-1);
+
+                predicate = predicate.And(b => b.PurchaseDate >= filterDateStart 
+                                             && b.PurchaseDate <= filterDateEnd);
             }
 
             return predicate;

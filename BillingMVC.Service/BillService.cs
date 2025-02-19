@@ -1,67 +1,92 @@
 ﻿using BillingMVC.Core.Contracts.Repositories;
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Core.Entities;
+using BillingMVC.Service.PredicateBuilder;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace BillingMVC.Service
 {
     public class BillService : IBillService
     {
-        private readonly IValidator<Bill> _validator;
+        private readonly IValidator<Bill> _validatorBill;
+        private readonly IValidator<BillFilter> _validatorBillFilter;
         private readonly IBillRepository _billRepository;   
 
         public BillService
                (IBillRepository billRepository, 
-                IValidator<Bill> validator)
+                IValidator<Bill> validatorBill, 
+                IValidator<BillFilter> validatorBillFilter)
         {
-            _validator = validator;
             _billRepository = billRepository;
+            _validatorBill = validatorBill;
+            _validatorBillFilter = validatorBillFilter;
         }
 
-        public ServiceResponse CreateBill(Bill bill)
+        public async Task<ServiceResponse> CreateBill(Bill bill)
         {
             if (bill == null)
             {
-                return new ServiceResponse { Success = false, Errors = new List<string> { "A despesa não pode ser nula." } };
+                return new ServiceResponse 
+                { Success = false, Errors = new List<string> 
+                { "A despesa não pode ser nula." } };
             }
 
-            var result = _validator.Validate(bill);
+            var result = _validatorBill.Validate(bill);
 
             if (!result.IsValid)
             {
                 return new ServiceResponse
                 {
                     Success = false,
-                    Errors = result.Errors.Select(e => e.ErrorMessage).ToList()
+                    Errors = result.Errors
+                                   .Select(e => e.ErrorMessage)
+                                   .ToList()
                 };
             }
 
-            _billRepository.Add(bill);
+            await _billRepository.Add(bill);
             return new ServiceResponse { Success = true };
         }
 
-        public IEnumerable<Bill> List()
+        public async Task<IEnumerable<Bill>> List()
         {
-            return _billRepository.GetAll();
+            return await _billRepository.GetAll();
         }
 
-        public IEnumerable<Bill> GetBillsWithFilter
-                                 (Expression<Func<Bill, bool>> 
-                                  filter)
+        public async Task<ServiceResponseGeneric<IEnumerable<Bill>>> GetBillsWithFilter
+                                                                     (BillFilter filter)
         {
-            return _billRepository.GetBillsWithFilter(filter);
+            var validationResult = _validatorBillFilter.Validate(filter);
+            if (!validationResult.IsValid)
+            {
+                return new ServiceResponseGeneric<IEnumerable<Bill>>
+                {
+                    Success = false,
+                    Errors = validationResult.Errors
+                                             .Select(e => e.ErrorMessage)
+                                             .ToList()
+                };
+            }
+
+            Expression<Func<Bill, bool>> filterExpression = 
+                BillPredicateBuilder.Build(filter);
+
+            var bills = await _billRepository.GetBillsWithFilter
+                                              (filterExpression);
+
+            return new ServiceResponseGeneric<IEnumerable<Bill>>
+            {
+                Success = true,
+                Data = bills
+            };
         }
 
-        public List<Bill> GetAllFromCurrentMonth()
-        {
-            throw new NotImplementedException();
-        }
-
-        public ServiceResponse UpdateBill(Bill bill)
+        public async Task<ServiceResponse> UpdateBill(Bill bill)
         {
             var existingBill = _billRepository.GetById(bill.Id);
             if (existingBill == null)
@@ -69,38 +94,42 @@ namespace BillingMVC.Service
                 return new ServiceResponse
                 {
                     Success = false,
-                    Errors = new List<string> { "A despesa não foi encontrada." }
+                    Errors = new List<string> 
+                    { "A despesa não foi encontrada." }
                 };
             }
 
-            var result = _validator.Validate(bill);
+            var result = _validatorBill.Validate(bill);
             if (!result.IsValid)
             {
                 return new ServiceResponse
                 {
                     Success = false,
-                    Errors = result.Errors.Select(e => e.ErrorMessage).ToList()
+                    Errors = result.Errors
+                                   .Select(e => e.ErrorMessage)
+                                   .ToList()
                 };
             }
 
-            _billRepository.Update(bill);
+            await _billRepository.Update(bill);
             return new ServiceResponse { Success = true };
         }
 
-        public ServiceResponse DeleteBill(Guid id)
+        public async Task<ServiceResponse> DeleteBill(Guid id)
         {
-            var entity = _billRepository.GetById(id);
+            var entity = await _billRepository.GetById(id);
 
             if (entity == null)
             {
                 return new ServiceResponse
                 {
                     Success = false,
-                    Errors = new List<string>() { "ID não corresponde a nenhuma despesa." }
+                    Errors = new List<string>() 
+                    { "ID não corresponde a nenhuma despesa." }
                 };
             }
 
-            _billRepository.Delete(entity);
+            await _billRepository.Delete(entity);
             return new ServiceResponse { Success = true };
         }
     }

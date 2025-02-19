@@ -12,8 +12,8 @@ namespace BillingMVC.Web.Models
 
         [Required(ErrorMessage = "Informe um nome.")]
         [StringLength(100, MinimumLength = 3,
-         ErrorMessage = "Nome da despesa não pode ter menos que 3 " +
-                        "caracteres.")]
+         ErrorMessage = "Nome da despesa não pode ter menos " +
+                        "que 3 caracteres.")]
         [DisplayName("Nome")]
         public string Name { get; set; }
 
@@ -21,21 +21,22 @@ namespace BillingMVC.Web.Models
         [DisplayName("Moeda")]
         public CurrencyVM Currency { get; set; }
 
-        [Required(ErrorMessage = "Informe o valor.")]
         [DisplayName("Valor")]
-        [DisplayFormat(DataFormatString = "{0:F2}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:F2}",
+            ApplyFormatInEditMode = true)]
         public double Value
         {
             get
             {
-                string valors = ValueString.Replace(',', '.');
-                double.TryParse(valors, 
+                string valorString = ValueString.Replace(',', '.');
+                double.TryParse(valorString, 
                     System.Globalization.NumberStyles.Currency, 
                     CultureInfo.InvariantCulture, out var valor);
                 return valor;
             }
         }
 
+        [Required(ErrorMessage = "Informe o valor.")]
         public string ValueString { get; set; }
 
         [Required(ErrorMessage = "Informe a categoria da despesa.")]
@@ -44,15 +45,16 @@ namespace BillingMVC.Web.Models
 
         [Required(ErrorMessage = "Informe a origem da despesa.")]
         [StringLength(100, MinimumLength = 2,
-         ErrorMessage = "Origem da despesa não pode ter menos que 2 " +
-                        "caracteres.")]
+         ErrorMessage = "Origem da despesa não pode ter menos " +
+                        "que 2 caracteres.")]
         [DisplayName("Origem")]
         public string Source { get; set; }
 
         [Required(ErrorMessage = "Informe a data da despesa.")]
         [DisplayName("Data da Despesa")]
         [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}",
+            ApplyFormatInEditMode = true)]
         public DateTime PurchaseDate { get; set; }
     }
 }

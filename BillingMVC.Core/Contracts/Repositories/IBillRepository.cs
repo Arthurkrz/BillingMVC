@@ -1,15 +1,15 @@
 ﻿using BillingMVC.Core.Entities;
-using BillingMVC.Core.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace BillingMVC.Core.Contracts.Repositories
 {
     public interface IBillRepository : IBaseRepository<Bill>
     {
-        IEnumerable<Bill> GetBillsWithFilter
+        Task<IEnumerable<Bill>> GetBillsWithFilter
                           (Expression<Func<Bill, bool>> predicate);
-        Bill GetById(Guid id);
+        Task<Bill> GetById(Guid id);
     }
 }
