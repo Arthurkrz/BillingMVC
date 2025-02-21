@@ -1,3 +1,4 @@
+using BillingMVC.Core.Contracts.Mapping;
 using BillingMVC.Core.Contracts.Repositories;
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Data.Repositories;
@@ -31,7 +32,7 @@ namespace BillingMVC.Web
             services.InjectValidator();
             services.InjectServices();
             services.InjectRepositories();
-            services.AddAutoMapper(typeof(MappingProfile));
+            services.AddSingleton<IMap, MappingProfile>();
             services.AddScoped<IBillRepository, BillRepository>();
             services.AddScoped<IBillService, BillService>();
         }

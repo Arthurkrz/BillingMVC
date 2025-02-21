@@ -1,6 +1,7 @@
-﻿using AutoMapper;
+﻿using BillingMVC.Core.Contracts.Mapping;
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Core.Entities;
+using BillingMVC.Core.Enum;
 using BillingMVC.Web.Models;
 using BillingMVC.Web.Models.Enum;
 using Microsoft.AspNetCore.Mvc;
@@ -14,8 +15,8 @@ namespace BillingMVC.Web.Controllers
     public class BillController : Controller
     {
         private readonly IBillService _billService;
-        private readonly IMapper _mapper;
-        public BillController(IBillService billService, IMapper mapper)
+        private readonly IMap _mapper;
+        public BillController(IBillService billService, IMap mapper)
         {
             _billService = billService;
             _mapper = mapper;
@@ -24,7 +25,24 @@ namespace BillingMVC.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var bills = await _billService.List();
-            var billsVM = _mapper.Map<List<BillViewModel>>(bills);
+            var billsVM = _mapper.Map<IEnumerable<Bill>, List<BillViewModel>>(bills,
+                new Dictionary<string, string>
+                {
+                    { "Currency", "Currency" },
+                    { "Type", "Type" },
+                    { "Value", "ValueString" },
+                    { "PurchaseDate", "PurchaseDate" }
+                },
+                new Dictionary<string, Func<object, object>>
+                {
+                    { "Currency", val => Enum.Parse<CurrencyVM>(val.ToString()) },
+
+                    { "Type", val => Enum.Parse<BillTypeVM>(val.ToString()) },
+
+                    { "Value", val => val != null ? string.Format("{0:0.00}", val) : "0.00" },
+
+                    { "PurchaseDate", val => DateTime.Parse(val.ToString()).ToString("yyyy-MM-dd") }
+                });
 
             double euroToRealRate = 5.50;
             double realToEuroRate = 1 / euroToRealRate;
@@ -59,7 +77,28 @@ namespace BillingMVC.Web.Controllers
                 return Json(new { success = false, errors = errors });
             }
 
-            var entity = _mapper.Map<Bill>(model);
+            var entity = _mapper.Map<BillViewModel, Bill>(model, 
+                new Dictionary<string, string>
+                {
+                    { "Currency", "Currency" },
+                    { "Type", "Type" },
+                    { "ValueString", "Value" }
+                },
+                new Dictionary<string, Func<object, object>>
+                {
+                    { "Currency", val => Enum.Parse<Currency>(val.ToString()) },
+
+                    { "Type", val => Enum.Parse<BillType>(val.ToString()) },
+
+                    { "ValueString", val => 
+                        val != null && double.TryParse(val.ToString(), out var result) ? result : 0
+                    },
+
+                    { "PurchaseDate", val =>
+                        DateTime.TryParse(val.ToString(), out var date) ? date : DateTime.Now
+                    }
+                });
+
             var result = await _billService.CreateBill(entity);
 
             if (!result.Success)
@@ -102,7 +141,29 @@ namespace BillingMVC.Web.Controllers
                 { "Adicione pelo menos 1 parâmetro de busca." } });
             }
 
-            var filterModel = _mapper.Map<BillFilter>(filterViewModel);
+            var filterModel = _mapper.Map<BillFilterViewModel, BillFilter>(filterViewModel,
+                new Dictionary<string, string>
+                {
+
+                    { "ValueStringRangeStart", "ValueRangeStart" },
+                    { "ValueStringRangeEnd", "ValueRangeEnd" },
+                    { "DateRangeStart", "DateRangeStart" },
+                    { "DateRangeEnd", "DateRangeEnd" },
+                    { "Currency", "Currency" },
+                    { "Type", "Type" },
+                    { "Month", "Month" }
+                },
+                new Dictionary<string, Func<object, object>>
+                {
+                    { "ValueStringRangeStart", val => double.TryParse(val.ToString(), out var result) ? result : (double?)null },
+                    { "ValueStringRangeEnd", val => double.TryParse(val.ToString(), out var result) ? result : (double?)null },
+                    { "DateRangeStart", val => DateTime.Parse(val.ToString()) },
+                    { "DateRangeEnd", val => DateTime.Parse(val.ToString()) },
+                    { "Currency", val => Enum.Parse<Currency>(val.ToString()) },
+                    { "Type", val => Enum.Parse<BillType>(val.ToString()) },
+                    { "Month", val => Enum.Parse<PurchaseMonth>(val.ToString()) }
+                });
+
             var response = await _billService.GetBillsWithFilter(filterModel);
 
             if (!response.Success)
@@ -110,7 +171,21 @@ namespace BillingMVC.Web.Controllers
                 return Json(new { success = false, errors = response.Errors });
             }
 
-            var billsViewModel = _mapper.Map<List<BillViewModel>>(response.Data);
+            var billsViewModel = _mapper.Map<IEnumerable<Bill>, List<BillViewModel>>(response.Data,
+                new Dictionary<string, string>
+                {
+                    {"Currency", "Currency" },
+                    {"Type", "Type" },
+                    {"Value", "ValueString" },
+                    {"PurchaseDate", "PurchaseDate" }
+                },
+                new Dictionary<string, Func<object, object>>
+                {
+                    { "Currency", val => Enum.Parse<CurrencyVM>(val.ToString()) },
+                    { "Type", val => Enum.Parse<BillTypeVM>(val.ToString()) },
+                    { "Value", val => ToString() },
+                    { "PurchaseDate", val => DateTime.TryParse(val.ToString(), out var date) }
+                });
 
             return PartialView("_BillTable", billsViewModel);
         }
@@ -133,7 +208,7 @@ namespace BillingMVC.Web.Controllers
         {
             if (billVM.Id == Guid.Empty)
             {
-                return Json(new { success = false, errors = new List<string> 
+                return Json(new { success = false, errors = new List<string>
                 { "ID da despesa inválido." } });
             }
 
@@ -147,7 +222,21 @@ namespace BillingMVC.Web.Controllers
                 return Json(new { success = false, errors = errors });
             }
 
-            var entity = _mapper.Map<Bill>(billVM);
+            var entity = _mapper.Map<BillViewModel, Bill>(billVM,
+                new Dictionary<string, string>
+                {
+                    { "Currency", "Currency" },
+                    { "Type", "Type" },
+                    { "ValueString", "Value" },
+
+                },
+                new Dictionary<string, Func<object, object>>
+                {
+                    { "Currency", val => Enum.Parse<Currency>(val.ToString()) },
+                    { "Type", val => Enum.Parse<BillType>(val.ToString()) },
+                    { "ValueString", val => val != null && double.TryParse(val.ToString(), out var result) ? result : 0 }
+                });
+
             var result = await _billService.UpdateBill(entity);
 
             if (!result.Success)

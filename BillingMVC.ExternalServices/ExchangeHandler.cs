@@ -1,9 +1,9 @@
 ﻿using System;
 
-namespace BillingMVC.ExternalServices
-{
-    public class ExchangeHandler : IExchangeHandler
-    {
+//namespace BillingMVC.ExternalServices
+//{
+//    public class ExchangeHandler : IExchangeHandler
+//    {
 
-    }
-}
+////    }
+//}

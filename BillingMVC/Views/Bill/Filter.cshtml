@@ -15,6 +15,10 @@
     valueEnd = Model.ValueStringRangeEnd.Replace(',', '.');
 }
 
+@section Styles { 
+    <link rel="stylesheet" href="~/css/Bill/Filter.css" />
+}
+
 <h1 style="font-size: 26px;">Filtragem de Contas</h1>
 <div class="d-flex justify-content-between mb-3" style="padding-top: 10px">
 
@@ -101,8 +105,8 @@
         <div id="valueSidebar" class="sidebar-box border border-dark p-3 bg-white shadow d-none">
             <label asp-for="ValueStringRangeStart" class="fw-bold">Início de intervalo</label>
             <input asp-for="ValueStringRangeStart" type="number" class="form-control mt-1" step="0.01" />
-            <label asp-for="ValueRangeStart" class="fw-bold mt-2">Fim de intervalo</label>
-            <input asp-for="ValueRangeEnd" type="number" class="form-control mt-1" step="0.01" />
+            <label asp-for="ValueStringRangeEnd" class="fw-bold mt-2">Fim de intervalo</label>
+            <input asp-for="ValueStringRangeEnd" type="number" class="form-control mt-1" step="0.01" />
         </div>
 
         <hr class="mt-3 mb-2" style="color: dimgrey; opacity: 0,8;" />
@@ -129,110 +133,6 @@
     </div>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const dateLabel = document.getElementById("dateLabel");
-        const valueLabel = document.getElementById("valueLabel");
-        const dateSidebar = document.getElementById("dateSidebar");
-        const valueSidebar = document.getElementById("valueSidebar");
-
-        function positionSidebar(label, sidebar) {
-            const rect = label.getBoundingClientRect();
-            const parentRect = label.closest(".card").getBoundingClientRect();
-
-            sidebar.style.position = "absolute";
-            sidebar.style.top = `${rect.top - parentRect.top + label.offsetHeight + 5}px`;
-            sidebar.style.left = `${rect.left - parentRect.left + 10}px`;
-            sidebar.classList.remove("d-none");
-        }
-
-        function hideSidebar(sidebar) {
-            setTimeout(() => {
-                if (!sidebar.matches(":hover")) {
-                    sidebar.classList.add("d-none");
-                }
-            }, 200);
-        }
-
-        dateLabel.addEventListener("mouseenter", () => positionSidebar(dateLabel, dateSidebar));
-        valueLabel.addEventListener("mouseenter", () => positionSidebar(valueLabel, valueSidebar));
-
-        dateSidebar.addEventListener("mouseenter", () => dateSidebar.classList.remove("d-none"));
-        valueSidebar.addEventListener("mouseenter", () => valueSidebar.classList.remove("d-none"));
-
-        dateLabel.addEventListener("mouseleave", () => hideSidebar(dateSidebar));
-        dateSidebar.addEventListener("mouseleave", () => hideSidebar(dateSidebar));
-
-        valueLabel.addEventListener("mouseleave", () => hideSidebar(valueSidebar));
-        valueSidebar.addEventListener("mouseleave", () => hideSidebar(valueSidebar));
-
-    });
-
-    $(document).ready(function () {
-        $("#filterSearchButton").on("click", function (e) {
-            e.preventDefault();
-
-            let filterData = {
-                NameContains: $("#NameContains").val(),
-                SourceContains: $("#SourceContains").val(),
-                Currency: $("#Currency").val(),
-                Type: $("#Type").val(),
-                DateRangeStart: $("#DateRangeStart").val(),
-                DateRangeEnd: $("#DateRangeEnd").val(),
-                ValueStringRangeStart: $("#ValueStringRangeStart").val(),
-                ValueStringRangeEnd: $("#ValueStringRangeEnd").val()
-            };
-
-            $.ajax({
-                url: "@Url.Action("Filter", "Bill")",
-                type: "POST",
-                data: filterData,
-                success: function (response) {
-                    if (response.success) {
-                        $("#filteredResults").html(response);
-                    } else {
-                        let errorContainer = $("#errorMessages");
-                        if (response.errors && response.errors.length > 0) {
-                            errorContainer.html(response.errors.join("<br>"));
-                            errorContainer.removeClass("d-none").show();
-                        } else {
-                            errorContainer.html("Erro desconhecido.");
-                            errorContainer.removeClass("d-none").show();
-                        }
-                    }
-                },
-                error: function () {
-                    $("#errorMessages")
-                        .html("Erro ao processar solicitação.")
-                        .removeClass("d-none").show();
-                }
-            });
-        });
-    });
-</script>
-
-<style>
-    .sidebar-box{
-        position: absolute;
-        min-width: 220px;
-        max-width: 250px;
-        z-index: 20;
-        background-color: white;
-        border: 1px solid black;
-        box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-        transition: opacity 0.2s ease-in-out;
-        padding: 10px;
-    }
-
-    hr{
-        position: relative;
-        z-index: 5;
-    }
-
-    .cursor-pointer{
-        font-size: 16px;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-    }
-</style>
+@section Scripts {
+    <script src="~/js/Bill/Filter.js"></script>
+}
