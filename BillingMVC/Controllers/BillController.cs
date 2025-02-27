@@ -1,4 +1,5 @@
-﻿using BillingMVC.Core.Contracts.Mapping;
+﻿using BillingMVC.Core.Contracts.ExternalServices;
+using BillingMVC.Core.Contracts.Mapping;
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Core.Entities;
 using BillingMVC.Core.Enum;
@@ -16,10 +17,13 @@ namespace BillingMVC.Web.Controllers
     {
         private readonly IBillService _billService;
         private readonly IMap _mapper;
-        public BillController(IBillService billService, IMap mapper)
+        private readonly IExchangeService _exchangeService;
+
+        public BillController(IBillService billService, IMap mapper, IExchangeService exchangeService)
         {
             _billService = billService;
             _mapper = mapper;
+            _exchangeService = exchangeService;
         }
 
         public async Task<IActionResult> Index()
@@ -44,12 +48,14 @@ namespace BillingMVC.Web.Controllers
                     { "PurchaseDate", val => DateTime.Parse(val.ToString()).ToString("yyyy-MM-dd") }
                 });
 
+            ViewBag.Rates = await _exchangeService.GetExchangeAsync();
+
             double euroToRealRate = 5.50;
             double realToEuroRate = 1 / euroToRealRate;
 
-            double totalInReais = billsVM.Sum(bill => bill.Currency == 
+            double totalInReais = billsVM.Sum(bill => bill.Currency ==
             CurrencyVM.Euro ? bill.Value * euroToRealRate : bill.Value);
-            double totalInEuros = billsVM.Sum(bill => bill.Currency == 
+            double totalInEuros = billsVM.Sum(bill => bill.Currency ==
             CurrencyVM.Real ? bill.Value * realToEuroRate : bill.Value);
 
             ViewBag.TotalInReais = totalInReais;
@@ -77,7 +83,7 @@ namespace BillingMVC.Web.Controllers
                 return Json(new { success = false, errors = errors });
             }
 
-            var entity = _mapper.Map<BillViewModel, Bill>(model, 
+            var entity = _mapper.Map<BillViewModel, Bill>(model,
                 new Dictionary<string, string>
                 {
                     { "Currency", "Currency" },
@@ -90,7 +96,7 @@ namespace BillingMVC.Web.Controllers
 
                     { "Type", val => Enum.Parse<BillType>(val.ToString()) },
 
-                    { "ValueString", val => 
+                    { "ValueString", val =>
                         val != null && double.TryParse(val.ToString(), out var result) ? result : 0
                     },
 
@@ -137,8 +143,12 @@ namespace BillingMVC.Web.Controllers
                 && filterViewModel.Currency == null
                 && filterViewModel.Type == null)
             {
-                return Json(new { success = false, errors = new List<string> 
-                { "Adicione pelo menos 1 parâmetro de busca." } });
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string>
+                { "Adicione pelo menos 1 parâmetro de busca." }
+                });
             }
 
             var filterModel = _mapper.Map<BillFilterViewModel, BillFilter>(filterViewModel,
@@ -192,7 +202,7 @@ namespace BillingMVC.Web.Controllers
 
         public async Task<IActionResult> Delete(Guid id)
         {
-           var bill = await _billService.DeleteBill(id);
+            var bill = await _billService.DeleteBill(id);
 
             if (bill == null)
             {
@@ -208,8 +218,12 @@ namespace BillingMVC.Web.Controllers
         {
             if (billVM.Id == Guid.Empty)
             {
-                return Json(new { success = false, errors = new List<string>
-                { "ID da despesa inválido." } });
+                return Json(new
+                {
+                    success = false,
+                    errors = new List<string>
+                { "ID da despesa inválido." }
+                });
             }
 
             if (!ModelState.IsValid)

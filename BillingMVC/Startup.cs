@@ -28,8 +28,10 @@ namespace BillingMVC.Web
             string test = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
             var stringDb = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<Context>(options => options.UseSqlServer(stringDb));
+            services.AddMemoryCache();
             services.AddControllersWithViews();
             services.InjectValidator();
+            services.InjectExternalServices();
             services.InjectServices();
             services.InjectRepositories();
             services.AddSingleton<IMap, MappingProfile>();
