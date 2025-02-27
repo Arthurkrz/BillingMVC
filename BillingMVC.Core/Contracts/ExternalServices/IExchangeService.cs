@@ -1,13 +1,12 @@
-﻿using BillingMVC.Core.DTOS;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BillingMVC.Core.Contracts.ExternalServices
 {
-    public interface IExchangeHandler
+    public interface IExchangeService
     {
-        Task<ExchangeResult> GetExchangeOfTheDay();
+        Task<Dictionary<string, double>> GetExchangeAsync();
     }
 }

@@ -21,16 +21,19 @@ namespace BillingMVC.Web.Mapping
             Type sourceType = typeof(TSource);
             Type targetType = typeof(TTarget);
 
-            var sourceProps = sourceType.GetProperties();
-            var targetProps = targetType.GetProperties();
+            var sourceProps = sourceType.GetProperties().ToDictionary(p => p.Name.ToLower(), p => p);
+            var targetProps = targetType.GetProperties().ToDictionary(p => p.Name.ToLower(), p => p);
 
-            foreach (var sourceProp in sourceProps)
+            foreach (var sourceProp in sourceProps.Values)
             {
                 string targetPropName = mappingProps != null && mappingProps.ContainsKey(sourceProp.Name)
                      ? mappingProps[sourceProp.Name] : sourceProp.Name;
 
-                var targetProp = targetProps.FirstOrDefault(x => x.Name == sourceProp.Name);
-                if (targetProp == null) continue;
+                targetPropName = targetPropName.ToLower();
+
+                if (!targetProps.ContainsKey(targetPropName)) continue;
+
+                var targetProp = targetProps[targetPropName];
 
                 if (mappingProps != null && mappingProps.ContainsKey(sourceProp.Name))
                 {
@@ -70,13 +73,14 @@ namespace BillingMVC.Web.Mapping
             if (source == null) return null;
 
             object target = Activator.CreateInstance(targetType);
-            var sourceProps = source.GetType().GetProperties();
-            var targetProps = targetType.GetProperties();
+            var sourceProps = source.GetType().GetProperties().ToDictionary(p => p.Name.ToLower(), p => p);
+            var targetProps = targetType.GetProperties().ToDictionary(p => p.Name.ToLower(), p => p);
 
-            foreach(var sourceProp in sourceProps)
+            foreach(var sourceProp in sourceProps.Values)
             {
-                var targetProp = targetProps.FirstOrDefault(x => x.Name == sourceProp.Name);
-                if (targetProp == null) continue;
+                if (!targetProps.ContainsKey(sourceProp.Name)) continue;
+
+                var targetProp = targetProps[sourceProp.Name];
 
                 if (targetProp.PropertyType == sourceProp.PropertyType &&
                    !targetProp.PropertyType.IsClass &&

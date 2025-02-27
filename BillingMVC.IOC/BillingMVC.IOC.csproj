@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BillingMVC.Core\BillingMVC.Core.csproj" />
     <ProjectReference Include="..\BillingMVC.Data\BillingMVC.Data.csproj" />
+    <ProjectReference Include="..\BillingMVC.ExternalServices\BillingMVC.ExternalServices.csproj" />
     <ProjectReference Include="..\BillingMVC.Service\BillingMVC.Service.csproj" />
   </ItemGroup>
 
