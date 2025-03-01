@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using StackExchange.Redis;
 
 namespace BillingMVC.Web
 {
@@ -25,6 +26,8 @@ namespace BillingMVC.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var redisConnectionString = Configuration["Redis:ConnectoinString"];
+            services.AddSingleton<IConnectionMultiplexer>(c => ConnectionMultiplexer.Connect(redisConnectionString));
             string test = Configuration.GetSection("ConnectionStrings:DefaultConnection").Value;
             var stringDb = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<Context>(options => options.UseSqlServer(stringDb));

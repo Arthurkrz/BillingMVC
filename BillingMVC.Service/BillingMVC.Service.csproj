@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="2.8.24" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BillingMVC.Core\BillingMVC.Core.csproj" />
   </ItemGroup>
 

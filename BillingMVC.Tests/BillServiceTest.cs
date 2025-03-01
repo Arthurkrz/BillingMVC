@@ -4,237 +4,413 @@ using BillingMVC.Core.Enum;
 using BillingMVC.Core.Validators;
 using BillingMVC.Data.Repositories;
 using BillingMVC.Service;
+using BillingMVC.Service.PredicateBuilder;
 using Bogus;
 using FluentValidation;
 using FluentValidation.Results;
+using LinqKit;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BillingMVC.Tests
 {
-    //public class BillServiceTest
-    //{
-    //    private readonly BillService _sut;
-    //    private readonly Faker _faker;
-    //    private IValidator<Bill> _validator;
-    //    private readonly Mock<IBillRepository> _mockRepository;
+    public class BillServiceTest
+    {
+        private readonly BillService _sut;
+        private readonly Faker _faker;
+        private IValidator<Bill> _validator;
+        private IValidator<BillFilter> _validatorFilter;
+        private readonly Mock<IBillRepository> _mockRepository;
 
-    //    public BillServiceTest()
-    //    {
-    //        _validator = new BillValidator();
-    //        _faker = new Faker();
-    //        _mockRepository = new Mock<IBillRepository>();
-    //        _sut = new BillService(_mockRepository.Object, _validator);
-    //    }
+        public BillServiceTest()
+        {
+            _validator = new BillValidator();
+            _validatorFilter = new BillFilterValidator();
+            _faker = new Faker();
+            _mockRepository = new Mock<IBillRepository>();
+            _sut = new BillService(_mockRepository.Object, _validator, _validatorFilter);
+        }
 
-    //    [Fact]
-    //    public void CreateBill_DeveAdicionarComSucesso_QuandoObjetoValido()
-    //    {
-    //        // Arrange
-    //        Bill bill = new Bill()
-    //        {
-    //            Name = _faker.Name.FirstName(),
-    //            Currency = _faker.PickRandom<Currency>(),
-    //            Value = _faker.Random.Double(1, 1000000),
-    //            Type = _faker.PickRandom<BillType>(),
-    //            PurchaseDate = _faker.Date.Future(),
-    //            Source = _faker.Random.Word(),
-    //        };
+        [Fact]
+        public async Task CreateBill_MustAddSuccesfully()
+        {
+            // Arrange
+            Bill bill = new Bill()
+            {
+                Name = _faker.Name.FirstName(),
+                Currency = _faker.PickRandom<Currency>(),
+                Value = _faker.Random.Double(1, 1000000),
+                Type = _faker.PickRandom<BillType>(),
+                PurchaseDate = _faker.Date.Future(),
+                Source = _faker.Random.Word(),
+            };
 
-    //        // Act
-    //        _sut.CreateBill(bill);
+            // Act
+            await _sut.CreateBill(bill);
 
-    //        // Assert
-    //        _mockRepository.Verify(x => x.Add(bill), Times.Once);
-    //    }
+            // Assert
+            _mockRepository.Verify(x => x.Add(bill), Times.Once);
+        }
 
-    //    [Theory]
-    //    [MemberData(nameof(GetInvalidBills))]
-    //    public void CreateBill_DeveRetornarErro_QuandoPropriedadeInvalida
-    //                (Bill bill, string errorMessage)
-    //    {
-    //        // Act & Assert
-    //        var result = Assert.Throws<InvalidOperationException>(() =>
-    //                                             _sut.CreateBill(bill));
+        [Theory]
+        [MemberData(nameof(GetInvalidBills))]
+        public async Task CreateBill_MustReturnError_WhenInvalidProperty
+                    (Bill bill, string errorMessage)
+        {
+            // Act & Assert
+            var result = await _sut.CreateBill(bill);
 
-    //        string message = result.Message.Replace("\r\n", string.Empty);
-    //        Assert.Equal(message, errorMessage);
-    //    }
+            Assert.False(result.Success);
+            Assert.Contains(errorMessage, result.Errors);
+        }
 
-    //    [Fact]
-    //    public void CreateBill_DeveRetornarErro_QuandoObjetoNulo()
-    //    {
-    //        // Arrange
-    //        Bill bill = null;
+        [Fact]
+        public async Task CreateBill_MustReturnError_WhenNullObject()
+        {
+            // Arrange
+            Bill bill = null;
 
-    //        // Act & Assert
-    //        Assert.Throws<Exception>(() =>
-    //               _sut.CreateBill(bill));
-    //    }
+            // Act
+            var result = await _sut.CreateBill(bill);
 
-    //    public static IEnumerable<object[]> GetInvalidBills()
-    //    {
-    //        var faker = new Faker();
+            // Act & Assert
+            Assert.False(result.Success);
+            Assert.Contains("A despesa não pode ser nula.", result.Errors);
+        }
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = null,
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = faker.Random.Double(1, 1000000),
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = faker.Date.Future(1, DateTime.Now),
-    //                Source = faker.Random.Word(),
-    //            },
+        [Fact]
+        public async Task List_MustCallRepository()
+        {
+            // Act & Assert
+            var result = await _sut.List();
+            Assert.NotNull(result);
+        }
 
-    //            "Insira um nome."
-    //        };
+        [Fact]
+        public async Task GetBillsWithFilter_MustGetSuccesfully()
+        {
+            BillFilter billFilter = new BillFilter
+            {
+                NameContains = "Arroz",
+                SourceContains = "Jacomar",
+                ValueRangeStart = 25,
+                ValueRangeEnd = 150,
+                DateRangeStart = DateTime.Now.AddMonths(-1),
+                DateRangeEnd = DateTime.Now,
+                Currency = Currency.Real,
+                Type = BillType.Food,
+                Month = PurchaseMonth.February
+            };
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = null,
-    //                Value = faker.Random.Double(1, 1000000),
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = faker.Date.Future(1, DateTime.Now),
-    //                Source = faker.Random.Word(),
-    //            },
+            var filterExpression = BillPredicateBuilder.Build(billFilter);
+            Assert.NotNull(filterExpression);
 
-    //            "Especifique a moeda."
-    //        };
+            var result = await _sut.GetBillsWithFilter(billFilter);
+            _mockRepository.Verify(x => x.GetBillsWithFilter(It.IsAny<Expression<Func<Bill, bool>>>()), Times.AtLeastOnce);
+            Assert.True(result.Success);
+        }
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = 0,
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = faker.Date.Future(1, DateTime.Now),
-    //                Source = faker.Random.Word(),
-    //            },
+        [Theory]
+        [MemberData(nameof(GetInvalidFilters))]
+        public async Task GetBillsWithFilter_MustReturnError_WhenInvalidFilter
+                          (BillFilter billFilter, string errorMessage)
+        {
+            // Act & Assert
+            var result = await _sut.GetBillsWithFilter(billFilter);
 
-    //            "Especifique o valor da conta."
-    //        };
+            Assert.False(result.Success);
+            Assert.Contains(errorMessage, result.Errors);
+        }
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = faker.Random.Double(1, 1000000),
-    //                Type = null,
-    //                PurchaseDate = faker.Date.Future(1, DateTime.Now),
-    //                Source = faker.Random.Word(),
-    //            },
+        [Fact]
+        public async Task UpdateBill_MustUpdateSuccesfully()
+        {
+            // Arrange
+            Bill bill = new Bill
+            {
+                Id = new Guid(),
+                Name = "Almoço",
+                Currency = Currency.Euro,
+                Value = 1000,
+                Type = BillType.Food,
+                PurchaseDate = DateTime.Now,
+                Source = "Batel Grill"
+            };
 
-    //            "Especifique a categoria da conta."
-    //        };
+            _mockRepository.Setup(x => x.GetById(bill.Id)).ReturnsAsync(bill);
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = faker.Random.Double(1, 1000000),
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = default,
-    //                Source = faker.Random.Word(),
-    //            },
+            var result = await _sut.UpdateBill(bill);
 
-    //            "Insira uma data de " +
-    //            "vencimento da conta."
-    //        };
+            Assert.True(result.Success);
+            _mockRepository.Verify(x => x.Update(bill), Times.Once);
+        }
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = faker.Random.Double(1, 1000000),
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = faker.Date.Future(1, DateTime.Now),
-    //                Source = null,
-    //            },
+        [Theory]
+        [MemberData(nameof(GetInvalidBills))]
+        public async Task UpdateBill_MustReturnError_WhenInvalidProperty(Bill bill, string errorMessage)
+        {
+            _mockRepository.Setup(x => x.GetById(bill.Id))
+                           .ReturnsAsync(bill);
 
-    //            "Insira a origem da conta."
-    //        };
+            var result = await _sut.UpdateBill(bill);
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = faker.Random.Double(1, 1000000),
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = faker.Date.Future(1, DateTime.Now),
-    //                Source = faker.Random.Word(),
-    //            },
+            Assert.False(result.Success);
+            Assert.Contains(errorMessage, result.Errors);
+        }
 
-    //            "Especifique se a conta " +
-    //            "foi paga ou não."
-    //        };
+        [Fact]
+        public async Task UpdateBill_MustReturnError_WhenBillNotFound()
+        {
+            // Arrange
+            Bill bill = new Bill
+            {
+                Id = new Guid(),
+                Name = "Almoço",
+                Currency = Currency.Euro,
+                Value = 1000,
+                Type = BillType.Food,
+                PurchaseDate = DateTime.Now,
+                Source = "Batel Grill"
+            };
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = 1000001,
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = faker.Date.Future(1, DateTime.Now),
-    //                Source = faker.Random.Word(),
-    //            },
+            // Act
+            var result = await _sut.UpdateBill(bill);
 
-    //            "O valor da conta não pode " +
-    //            "ser maior que R$ 1 milhão."
-    //        };
+            // Assert
+            Assert.False(result.Success);
+            Assert.Contains("A despesa não foi encontrada.", result.Errors);
+        }
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = faker.Random.Double(1, 1000000),
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = DateTime.Now.AddMonths(-6),
-    //                Source = faker.Random.Word(),
-    //            },
+        [Fact]
+        public async Task DeleteBill_MustDeleteSuccesfully()
+        {
+            // Arrange
+            Guid id = new Guid();
+            Bill bill = new Bill();
 
-    //            "Contas não pagas vencidas há " +
-    //            "mais de 6 meses não podem " +
-    //            "ser adicionadas."
-    //        };
+            _mockRepository.Setup(x => x.GetById(id)).ReturnsAsync(bill);
 
+            // Act
+            var result = await _sut.DeleteBill(id);
 
-    //        yield return new object[]
-    //        {
-    //            new Bill()
-    //            {
-    //                Name = faker.Name.FirstName(),
-    //                Currency = faker.PickRandom<Currency>(),
-    //                Value = faker.Random.Double(1, 1000000),
-    //                Type = faker.PickRandom<BillType>(),
-    //                PurchaseDate = DateTime.Now.AddYears(-1),
-    //                Source = faker.Random.Word(),
-    //            },
+            // Assert
+            _mockRepository.Verify(x => x.Delete(bill), Times.Once);
+            Assert.True(result.Success);
+        }
 
-    //            "Contas vencidas a mais " +
-    //            "de 1 ano não podem " +
-    //            "ser adicionadas."
-    //        };
-    //    }
-    //}
+        [Fact]
+        public async Task DeleteBill_MustReturnError_WhenObjectNotFound()
+        {
+            // Act & Assert
+            var result = await _sut.DeleteBill(new Guid());
+
+            Assert.False(result.Success);
+            Assert.Contains("ID não corresponde a nenhuma despesa.", result.Errors);
+        }
+
+        public static IEnumerable<object[]> GetInvalidBills()
+        {
+            var faker = new Faker();
+
+            yield return new object[]
+            {
+                new Bill()
+                {
+                    Name = null,
+                    Currency = faker.PickRandom<Currency>(),
+                    Value = faker.Random.Double(1, 1000000),
+                    Type = faker.PickRandom<BillType>(),
+                    PurchaseDate = faker.Date.Future(1, DateTime.Now),
+                    Source = faker.Random.Word(),
+                },
+
+                "Insira um nome."
+            };
+
+            yield return new object[]
+            {
+                new Bill()
+                {
+                    Name = faker.Name.FirstName(),
+                    Currency = null,
+                    Value = faker.Random.Double(1, 1000000),
+                    Type = faker.PickRandom<BillType>(),
+                    PurchaseDate = faker.Date.Future(1, DateTime.Now),
+                    Source = faker.Random.Word(),
+                },
+
+                "Especifique a moeda."
+            };
+
+            yield return new object[]
+            {
+                new Bill()
+                {
+                    Name = faker.Name.FirstName(),
+                    Currency = faker.PickRandom<Currency>(),
+                    Value = 0,
+                    Type = faker.PickRandom<BillType>(),
+                    PurchaseDate = faker.Date.Future(1, DateTime.Now),
+                    Source = faker.Random.Word(),
+                },
+
+                "Especifique o valor da despesa."
+            };
+
+            yield return new object[]
+            {
+                new Bill()
+                {
+                    Name = faker.Name.FirstName(),
+                    Currency = faker.PickRandom<Currency>(),
+                    Value = faker.Random.Double(1, 1000000),
+                    Type = null,
+                    PurchaseDate = faker.Date.Future(1, DateTime.Now),
+                    Source = faker.Random.Word(),
+                },
+
+                "Especifique a categoria da despesa."
+            };
+
+            yield return new object[]
+            {
+                new Bill()
+                {
+                    Name = faker.Name.FirstName(),
+                    Currency = faker.PickRandom<Currency>(),
+                    Value = faker.Random.Double(1, 1000000),
+                    Type = faker.PickRandom<BillType>(),
+                    PurchaseDate = default,
+                    Source = faker.Random.Word(),
+                },
+
+                "Insira a data da despesa."
+            };
+
+            yield return new object[]
+            {
+                new Bill()
+                {
+                    Name = faker.Name.FirstName(),
+                    Currency = faker.PickRandom<Currency>(),
+                    Value = faker.Random.Double(1, 1000000),
+                    Type = faker.PickRandom<BillType>(),
+                    PurchaseDate = faker.Date.Future(1, DateTime.Now),
+                    Source = null,
+                },
+
+                "Insira a origem da despesa."
+            };
+
+            yield return new object[]
+            {
+                new Bill()
+                {
+                    Name = faker.Name.FirstName(),
+                    Currency = faker.PickRandom<Currency>(),
+                    Value = 1000001,
+                    Type = faker.PickRandom<BillType>(),
+                    PurchaseDate = faker.Date.Future(1, DateTime.Now),
+                    Source = faker.Random.Word(),
+                },
+
+                "O valor da despesa não pode " +
+                "ser maior que R$ 1 milhão."
+            };
+
+            yield return new object[]
+            {
+                new Bill()
+                {
+                    Name = faker.Name.FirstName(),
+                    Currency = faker.PickRandom<Currency>(),
+                    Value = faker.Random.Double(1, 1000000),
+                    Type = faker.PickRandom<BillType>(),
+                    PurchaseDate = DateTime.Now.AddYears(-1),
+                    Source = faker.Random.Word(),
+                },
+
+                "Despesas de mais " +
+                "de 1 ano atrás não podem " +
+                "ser adicionadas."
+            };
+        }
+
+        public static IEnumerable<object[]> GetInvalidFilters()
+        {
+            Faker faker = new Faker();
+
+            yield return new object[]
+            {
+                new BillFilter()
+                {
+                    DateRangeStart = DateTime.Now
+                                             .AddYears(-1),
+                },
+
+                "Não é possível listar " +
+                "despesas de mais de " +
+                "1 ano atrás."
+            };
+
+            yield return new object[]
+            {
+                new BillFilter()
+                {
+                    DateRangeStart = DateTime.Now,
+                    DateRangeEnd = DateTime.Now
+                                           .AddDays(-1),
+                },
+
+                "O intervalo inicial de " +
+                "data da despesa não " +
+                "pode ser maior que " +
+                "o intervalo final."
+            };
+
+            yield return new object[]
+            {
+                new BillFilter()
+                {
+                    ValueRangeStart = 2,
+                    ValueRangeEnd = 1,
+                },
+
+                "O intervalo inicial de " +
+                "valor da despesa não " +
+                "pode ser maior que " +
+                "o intervalo final."
+            };
+
+            yield return new object[]
+            {
+                new BillFilter()
+                {
+                    ValueRangeStart = -1,
+                },
+
+                "O intervalo inicial de " +
+                "valor da despesa não " +
+                "pode ser menor " +
+                "que zero."
+            };
+
+            yield return new object[]
+            {
+                new BillFilter()
+                {
+                    ValueRangeEnd = 1000001,
+                },
+
+                "O intervalo final de " +
+                "valor da despesa não " +
+                "pode ser maior que " +
+                "1 milhão."
+            };
+        }
+    }
 }

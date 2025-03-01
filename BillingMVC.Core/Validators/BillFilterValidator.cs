@@ -15,15 +15,15 @@ namespace BillingMVC.Core.Validators
 
             this.RuleFor(f => f.DateRangeStart)
                 .LessThan(f => f.DateRangeEnd)
-                .WithMessage("O intervalo final de " +
+                .WithMessage("O intervalo inicial de " +
                 "data da despesa não pode ser maior " +
-                "que o intervalo inicial.");
+                "que o intervalo final.");
 
             this.RuleFor(f => f.ValueRangeStart)
                 .LessThan(f => f.ValueRangeEnd)
-                .WithMessage("O intervalo final de " +
+                .WithMessage("O intervalo inicial de " +
                 "valor da despesa não pode ser maior " +
-                "que o intervalo inicial.");
+                "que o intervalo final.");
 
             this.RuleFor(f => f.ValueRangeStart)
                 .GreaterThan(0)

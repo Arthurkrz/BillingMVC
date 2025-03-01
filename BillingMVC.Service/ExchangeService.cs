@@ -1,6 +1,7 @@
 ﻿using BillingMVC.Core.Contracts.ExternalServices;
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Service.Utilities;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -13,8 +14,7 @@ namespace BillingMVC.Service
         private readonly IExchangeHandler _exchangeHandler;
         private readonly IMemoryCacheService _memoryCacheService;
 
-        public ExchangeService(IExchangeHandler exchangeHandler, 
-                               IMemoryCacheService memoryCacheService)
+        public ExchangeService(IExchangeHandler exchangeHandler, IMemoryCacheService memoryCacheService)
         {
             _exchangeHandler = exchangeHandler;
             _memoryCacheService = memoryCacheService;

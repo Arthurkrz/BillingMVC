@@ -88,7 +88,7 @@ namespace BillingMVC.Service
 
         public async Task<ServiceResponse> UpdateBill(Bill bill)
         {
-            var existingBill = _billRepository.GetById(bill.Id);
+            var existingBill = await _billRepository.GetById(bill.Id);
             if (existingBill == null)
             {
                 return new ServiceResponse

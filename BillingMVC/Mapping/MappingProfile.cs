@@ -35,6 +35,8 @@ namespace BillingMVC.Web.Mapping
 
                 var targetProp = targetProps[targetPropName];
 
+                if (targetProp.SetMethod == null || !targetProp.SetMethod.IsPublic) continue;
+
                 if (mappingProps != null && mappingProps.ContainsKey(sourceProp.Name))
                 {
                     var mappedSpecial = SpecialMap(source, sourceProp, targetProp);
@@ -48,12 +50,35 @@ namespace BillingMVC.Web.Mapping
                 {
                     object value = sourceProp.GetValue(source);
                     targetProp.SetValue(target, value);
+                    continue;
                 }
-                else if (targetProp.PropertyType.IsEnum && 
-                         sourceProp.PropertyType.IsEnum)
+                else if (targetProp.PropertyType.IsEnum ||
+                        (Nullable.GetUnderlyingType(targetProp.PropertyType)?.IsEnum == true))
                 {
-                    object propSourceValue = sourceProp.GetValue(source);
-                    targetProp.SetValue(target, propSourceValue);
+                    var targetEnumType = Nullable.GetUnderlyingType(targetProp.PropertyType) ?? targetProp.PropertyType;
+                    var sourceEnumType = Nullable.GetUnderlyingType(sourceProp.PropertyType) ?? sourceProp.PropertyType;
+
+                    var sourceValue = sourceProp.GetValue(source);
+                    if (sourceValue != null)
+                    {
+                        var enumName = Enum.GetName(sourceEnumType, sourceValue);
+
+                        var targetValue = Enum.Parse(targetEnumType, enumName);
+
+                        var boxedTargetValue = Convert.ChangeType(targetValue, targetEnumType);
+                        targetProp.SetValue(target, boxedTargetValue);
+                    }
+                    else
+                    {
+                        targetProp.SetValue(target, null);
+                    }
+                    continue;
+                }
+                else if (targetProp.PropertyType == typeof(string) && sourceProp.PropertyType == typeof(string))
+                {
+                    object value = sourceProp.GetValue(source);
+                    targetProp.SetValue(target, value);
+                    continue;
                 }
                 else if (targetProp.PropertyType.IsClass && 
                          sourceProp.PropertyType.IsClass && 
@@ -107,23 +132,63 @@ namespace BillingMVC.Web.Mapping
         {
             if (source == null) return null;
 
-                if (sourceProp.Name == "Value" && 
-                    targetProp.Name.Contains("ValueString") && 
-                    sourceProp.PropertyType == typeof(double))
+            string sourceName = sourceProp.Name;
+            string targetName = targetProp.Name;
+
+                if (sourceName == "Value" && 
+                    targetName == "ValueString")
                 {
                     double value = (double)sourceProp.GetValue(source);
                     return value.ToString("F2", CultureInfo.InvariantCulture);
                 }
                 
-                else if (sourceProp.Name.Contains("ValueString") && 
-                         targetProp.Name == "Value" && 
-                         sourceProp.PropertyType == typeof(string))
+                if (sourceName == "ValueString" && 
+                    targetName == "Value")
                 {
                     string valueString = (string)sourceProp.GetValue(source);
                     if (double.TryParse(valueString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result))
                     {
                         return result;
                     }
+
+                    return 0.0;
+                }
+
+                if (sourceName == "ValueRangeStart" &&
+                    targetName == "ValueStringRangeStart")
+                {
+                    double value = (double)sourceProp.GetValue(source);
+                    return value.ToString("F2", CultureInfo.InvariantCulture);
+                }
+
+                if (sourceName == "ValueRangeEnd" &&
+                    targetName == "ValueStringRangeEnd")
+                {
+                    double value = (double)sourceProp.GetValue(source);
+                    return value.ToString("F2", CultureInfo.InvariantCulture);
+                }
+
+                if (sourceName == "ValueStringRangeStart" &&
+                    targetName == "ValueRangeStart")
+                {
+                    string valueString = (string)sourceProp.GetValue(source);
+                    if (double.TryParse(valueString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result))
+                    {
+                        return result;
+                    }
+
+                    return 0.0;
+                }
+
+                if (sourceName == "ValueStringRangeEnd" &&
+                    targetName == "ValueRangeEnd")
+                {
+                    string valueString = (string)sourceProp.GetValue(source);
+                    if (double.TryParse(valueString, NumberStyles.Any, CultureInfo.InvariantCulture, out double result))
+                    {
+                        return result;
+                    }
+
                     return 0.0;
                 }
 

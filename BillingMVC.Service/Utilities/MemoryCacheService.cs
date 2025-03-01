@@ -1,34 +1,35 @@
 ﻿using BillingMVC.Core.Contracts.Services;
 using Microsoft.Extensions.Caching.Memory;
+using StackExchange.Redis;
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BillingMVC.Service.Utilities
 {
     public class MemoryCacheService : IMemoryCacheService
     {
-        private readonly IMemoryCache _memoryCache;
+        private readonly IDatabase _redis;
         private readonly TimeSpan _cacheDuration = TimeSpan.FromHours(24);
 
-        public MemoryCacheService(IMemoryCache memoryCache)
+        public MemoryCacheService(IConnectionMultiplexer connectionMultiplexer)
         {
-            _memoryCache = memoryCache;
+            _redis = connectionMultiplexer.GetDatabase();
         }
 
         public async Task<T> GetOrCreateAsync<T>(string key, Func<Task<T>> createItem)
         {
-            if (!_memoryCache.TryGetValue(key, out T cachedItem))
+            var cachedValue = await _redis.StringGetAsync(key);
+            if (cachedValue.HasValue)
             {
-                cachedItem = await createItem();
-                var cacheEntryOptions = new MemoryCacheEntryOptions
-                {
-                    AbsoluteExpirationRelativeToNow = _cacheDuration
-                };
-
-                _memoryCache.Set(key, cachedItem);
+                return JsonSerializer.Deserialize<T>(cachedValue);
             }
 
-            return cachedItem;
+            T value = await createItem();
+            var serializedValue = JsonSerializer.Serialize(value);
+            await _redis.StringSetAsync(key, serializedValue, _cacheDuration);
+
+            return value;
         }
     }
 }
