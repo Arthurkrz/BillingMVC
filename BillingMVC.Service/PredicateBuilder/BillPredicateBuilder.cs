@@ -38,12 +38,12 @@ namespace BillingMVC.Service.PredicateBuilder
 
             if (filter.DateRangeStart.HasValue)
             {
-                predicate = predicate.And(b => b.PurchaseDate >= 
+                predicate = predicate.And(b => b.ExpenseDate >= 
                                       filter.DateRangeStart.Value);
             }
             if (filter.DateRangeEnd.HasValue)
             {
-                predicate = predicate.And(b => b.PurchaseDate <= 
+                predicate = predicate.And(b => b.ExpenseDate <= 
                                       filter.DateRangeEnd.Value);
             }
 
@@ -67,8 +67,8 @@ namespace BillingMVC.Service.PredicateBuilder
                 DateTime filterDateEnd = filterDateStart.AddMonths(1)
                                                         .AddDays(-1);
 
-                predicate = predicate.And(b => b.PurchaseDate >= filterDateStart 
-                                             && b.PurchaseDate <= filterDateEnd);
+                predicate = predicate.And(b => b.ExpenseDate >= filterDateStart 
+                                             && b.ExpenseDate <= filterDateEnd);
             }
 
             return predicate;

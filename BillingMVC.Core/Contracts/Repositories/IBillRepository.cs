@@ -8,8 +8,8 @@ namespace BillingMVC.Core.Contracts.Repositories
 {
     public interface IBillRepository : IBaseRepository<Bill>
     {
-        Task<IEnumerable<Bill>> GetBillsWithFilter
-                          (Expression<Func<Bill, bool>> predicate);
+        Task<IEnumerable<Bill>> GetBillsWithFilter(Expression<Func<Bill, bool>> predicate);
+
         Task<Bill> GetById(Guid id);
     }
 }

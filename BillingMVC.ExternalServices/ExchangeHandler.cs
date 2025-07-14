@@ -9,15 +9,17 @@ namespace BillingMVC.ExternalServices
 {
     public class ExchangeHandler : IExchangeHandler
     {
-        public async Task<ExchangeResult> GetExchangeOfTheDay()
+        public async Task<ExchangeResultDTO> GetExchangeOfTheDay()
         {
-            ExchangeResult result = new ExchangeResult();
+            ExchangeResultDTO result = new ExchangeResultDTO();
+
             using (var client = new HttpClient())
             {
                 string token = "dbcd1ba81b22497fc218af43f6658209";
                 string _base = "EUR";
                 string symbols = "BRL";
                 var url = new Uri($"https://api.exchangeratesapi.io/v1/latest?access_key={token}&base={_base}&symbols={symbols}");
+
                 var response = await client.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
@@ -28,8 +30,10 @@ namespace BillingMVC.ExternalServices
                     };
 
                     var content = await response.Content.ReadAsStringAsync();
-                    result = JsonSerializer.Deserialize<ExchangeResult>(content, options);
+
+                    result = JsonSerializer.Deserialize<ExchangeResultDTO>(content, options);
                     var json = JsonSerializer.Serialize(result, options);
+
                     return result;
                 }
             }

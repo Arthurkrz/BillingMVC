@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace BillingMVC.Core.Entities
 {
     public class ServiceResponseGeneric<T> : ServiceResponse
     {
         public T Data { get; set; }
+
         public ServiceResponseGeneric() { }
+
         public ServiceResponseGeneric(bool success, T data = default, 
             List<string> errors = null) : base(success, errors)
         {
