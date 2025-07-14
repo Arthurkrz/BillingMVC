@@ -12,12 +12,12 @@ namespace BillingMVC.Core.Validators
                        !string.IsNullOrEmpty(n))
                .WithMessage("Insira um nome.");
 
-            this.RuleFor(b => b.PurchaseDate)
+            this.RuleFor(b => b.ExpenseDate)
                 .NotNull().NotEqual(default(DateTime))
                 .WithMessage("Insira a data da " +
                              "despesa.");
 
-            this.RuleFor(b => b.PurchaseDate)
+            this.RuleFor(b => b.ExpenseDate)
                 .GreaterThan(DateTime.Now.AddYears(-1))
                 .WithMessage("Despesas de mais de 1 ano atrás não podem ser adicionadas.");
 

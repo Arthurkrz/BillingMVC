@@ -17,10 +17,9 @@ namespace BillingMVC.Service
         private readonly IValidator<BillFilter> _validatorBillFilter;
         private readonly IBillRepository _billRepository;   
 
-        public BillService
-               (IBillRepository billRepository, 
-                IValidator<Bill> validatorBill, 
-                IValidator<BillFilter> validatorBillFilter)
+        public BillService(IBillRepository billRepository, 
+                           IValidator<Bill> validatorBill, 
+                           IValidator<BillFilter> validatorBillFilter)
         {
             _billRepository = billRepository;
             _validatorBill = validatorBill;
@@ -32,8 +31,11 @@ namespace BillingMVC.Service
             if (bill == null)
             {
                 return new ServiceResponse 
-                { Success = false, Errors = new List<string> 
-                { "A despesa não pode ser nula." } };
+                { 
+                    Success = false, 
+                    Errors = new List<string> 
+                    { "A despesa não pode ser nula." } 
+                };
             }
 
             var result = _validatorBill.Validate(bill);
@@ -43,9 +45,7 @@ namespace BillingMVC.Service
                 return new ServiceResponse
                 {
                     Success = false,
-                    Errors = result.Errors
-                                   .Select(e => e.ErrorMessage)
-                                   .ToList()
+                    Errors = result.Errors.Select(e => e.ErrorMessage).ToList()
                 };
             }
 
@@ -53,13 +53,10 @@ namespace BillingMVC.Service
             return new ServiceResponse { Success = true };
         }
 
-        public async Task<IEnumerable<Bill>> List()
-        {
-            return await _billRepository.GetAll();
-        }
+        public async Task<IEnumerable<Bill>> List() =>
+            await _billRepository.GetAll();
 
-        public async Task<ServiceResponseGeneric<IEnumerable<Bill>>> GetBillsWithFilter
-                                                                     (BillFilter filter)
+        public async Task<ServiceResponseGeneric<IEnumerable<Bill>>> GetBillsWithFilter(BillFilter filter)
         {
             var validationResult = _validatorBillFilter.Validate(filter);
             if (!validationResult.IsValid)
@@ -67,17 +64,15 @@ namespace BillingMVC.Service
                 return new ServiceResponseGeneric<IEnumerable<Bill>>
                 {
                     Success = false,
-                    Errors = validationResult.Errors
-                                             .Select(e => e.ErrorMessage)
-                                             .ToList()
+                    Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
                 };
             }
 
             Expression<Func<Bill, bool>> filterExpression = 
                 BillPredicateBuilder.Build(filter);
 
-            var bills = await _billRepository.GetBillsWithFilter
-                                              (filterExpression);
+            var bills = await _billRepository.
+                GetBillsWithFilter(filterExpression);
 
             return new ServiceResponseGeneric<IEnumerable<Bill>>
             {
@@ -105,9 +100,7 @@ namespace BillingMVC.Service
                 return new ServiceResponse
                 {
                     Success = false,
-                    Errors = result.Errors
-                                   .Select(e => e.ErrorMessage)
-                                   .ToList()
+                    Errors = result.Errors.Select(e => e.ErrorMessage).ToList()
                 };
             }
 

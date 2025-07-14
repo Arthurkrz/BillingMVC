@@ -13,24 +13,24 @@ namespace BillingMVC.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Nome = table.Column<string>(maxLength: 50, nullable: false),
-                    Moeda = table.Column<int>(nullable: false),
-                    Valor = table.Column<double>(nullable: false),
-                    Tipo = table.Column<int>(nullable: false),
-                    Vencimento = table.Column<DateTime>(nullable: false),
-                    Origem = table.Column<string>(maxLength: 50, nullable: false),
-                    Pago = table.Column<bool>(nullable: false)
+                    Name = table.Column<string>(maxLength: 50, nullable: false),
+                    Currency = table.Column<int>(nullable: false),
+                    Value = table.Column<double>(nullable: false),
+                    Type = table.Column<int>(nullable: false),
+                    ExpenseDate = table.Column<DateTime>(nullable: false),
+                    Source = table.Column<string>(maxLength: 50, nullable: false),
+                    Paid = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Contas", x => x.Id);
+                    table.PrimaryKey("PK_Bills", x => x.Id);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Contas");
+                name: "Bills");
         }
     }
 }

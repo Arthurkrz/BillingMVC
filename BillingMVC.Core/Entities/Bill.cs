@@ -9,7 +9,7 @@ namespace BillingMVC.Core.Entities
         public Currency? Currency { get; set; }
         public double Value { get; set; }
         public BillType? Type { get; set; }
-        public DateTime PurchaseDate { get; set; }
+        public DateTime ExpenseDate { get; set; }
         public string Source { get; set; }
     }
 }

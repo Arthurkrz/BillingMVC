@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -21,6 +21,7 @@
     <ProjectReference Include="..\BillingMVC.Data\BillingMVC.Data.csproj" />
     <ProjectReference Include="..\BillingMVC.ExternalServices\BillingMVC.ExternalServices.csproj" />
     <ProjectReference Include="..\BillingMVC.Service\BillingMVC.Service.csproj" />
+    <ProjectReference Include="..\BillingMVC.Web\BillingMVC.Web.csproj" />
     <ProjectReference Include="..\BillingMVC\BillingMVC.Web.csproj" />
   </ItemGroup>
 

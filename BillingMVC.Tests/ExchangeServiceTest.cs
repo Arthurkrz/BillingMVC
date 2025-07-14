@@ -2,7 +2,6 @@
 using BillingMVC.Core.Contracts.Services;
 using BillingMVC.Core.DTOS;
 using BillingMVC.Service;
-using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -21,6 +20,7 @@ namespace BillingMVC.Tests
         {
             _exchangeHandlerMock = new Mock<IExchangeHandler>();
             _memoryCacheServiceMock = new Mock<IMemoryCacheService>();
+
             _sut = new ExchangeService(_exchangeHandlerMock.Object, 
                                        _memoryCacheServiceMock.Object);
         }
@@ -29,7 +29,7 @@ namespace BillingMVC.Tests
         public async Task ExchangeService_MustReturnExchangeRate_WhenCacheExists()
         {
             // Arrange
-            var exchangeResult = new ExchangeResult
+            var exchangeResult = new ExchangeResultDTO
             {
                 Rates = new Dictionary<string, double>
                 {
@@ -42,16 +42,14 @@ namespace BillingMVC.Tests
 
             _memoryCacheServiceMock.Setup(x => x.GetOrCreateAsync(
                                                  It.IsAny<string>(),
-                                                 It.IsAny<Func<Task<ExchangeResult>>>()))
+                                                 It.IsAny<Func<Task<ExchangeResultDTO>>>()))
                                                 .ReturnsAsync(exchangeResult);
-
-            // Act
+            // Act & Assert
             var result = await _sut.GetExchangeAsync();
 
-            // Assert
             _memoryCacheServiceMock.Verify(x => x.GetOrCreateAsync(
                                                   "exchange", 
-                                                  It.IsAny<Func<Task<ExchangeResult>>>()), 
+                                                  It.IsAny<Func<Task<ExchangeResultDTO>>>()), 
                                                   Times.Once);
 
             Assert.Equal(exchangeResult.Rates, result);

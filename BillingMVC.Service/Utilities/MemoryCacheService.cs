@@ -26,6 +26,7 @@ namespace BillingMVC.Service.Utilities
             }
 
             T value = await createItem();
+
             var serializedValue = JsonSerializer.Serialize(value);
             await _redis.StringSetAsync(key, serializedValue, _cacheDuration);
 
